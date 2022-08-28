@@ -18,4 +18,4 @@ then
   git stash pop > /dev/null
 fi
 
-return
+return 0
