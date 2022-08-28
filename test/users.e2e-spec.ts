@@ -62,6 +62,6 @@ describe('UsersController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/users')
       .expect(200)
-      .expect('Hello World!');
+      .expect('This action returns all users');
   });
 });
