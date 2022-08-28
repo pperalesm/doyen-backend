@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { APP_GUARD } from '@nestjs/core';
+import { MyTypeOrmLogger } from './shared/util/my-typeorm-logger';
 
 @Module({
   imports: [
@@ -21,6 +22,8 @@ import { APP_GUARD } from '@nestjs/core';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       autoLoadEntities: true,
+      logging: ['query', 'warn'],
+      logger: new MyTypeOrmLogger(),
     }),
     ThrottlerModule.forRoot({
       ttl: 60,

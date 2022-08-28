@@ -11,11 +11,10 @@ export class LoggerMiddleware implements NestMiddleware {
 
     res.on('finish', () => {
       const { statusCode } = res;
-      const contentLength = res.get('content-length');
       const diff = process.hrtime(startAt);
-      const responseTime = (diff[0] * 1e3 + diff[1] * 1e-6).toFixed(2);
+      const responseTime = (diff[0] * 1e3 + diff[1] * 1e-6).toFixed(0);
       this.logger.log(
-        `${method} ${originalUrl} ${statusCode} ${responseTime}ms ${ip}`,
+        `${method} ${originalUrl} ${statusCode} ${ip} ${responseTime}ms`,
       );
     });
 

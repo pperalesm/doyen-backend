@@ -4,6 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 
@@ -11,7 +12,9 @@ import { HttpAdapterHost } from '@nestjs/core';
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
-  catch(exception: unknown, host: ArgumentsHost): void {
+  logger = new Logger('Filter');
+
+  catch(exception: any, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
@@ -30,6 +33,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       statusCode: httpStatus,
       message: message,
     };
+
+    this.logger.error(exception.stack);
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
