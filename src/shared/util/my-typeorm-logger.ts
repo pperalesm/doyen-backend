@@ -13,7 +13,7 @@ export class MyTypeOrmLogger implements Logger {
   }
 
   logQuerySlow(time: number, query: string) {
-    this.logger.warn(`Query --${query}-- took ${time}ms`);
+    this.logger.warn(`Query --${query}-- \x1b[31m+${time}ms\x1b[0m`);
   }
 
   logSchemaBuild(message: string) {
