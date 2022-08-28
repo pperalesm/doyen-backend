@@ -1,4 +1,17 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-git stash && yarn test:e2e && git stash apply
+(git diff HEAD --quiet)
+diff=$?
+
+if test $diff -eq 1
+then
+  git stash
+fi
+
+yarn test:e2e
+
+if test $diff -eq 1
+then
+  git stash pop
+fi
