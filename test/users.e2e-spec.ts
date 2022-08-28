@@ -29,7 +29,7 @@ describe('UsersController (e2e)', () => {
           type: 'postgres',
           username: process.env.DB_USERNAME,
           password: process.env.DB_PASSWORD,
-          database: 'test',
+          database: 'test_users',
           entities: [User],
           synchronize: true,
           logging: ['warn'],
