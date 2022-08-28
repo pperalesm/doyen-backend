@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-$(git diff HEAD --quiet)
+(git diff HEAD --quiet)
 diff=$?
 
 if test $diff -eq 1
@@ -9,7 +9,7 @@ then
   echo "Stashed local changes before testing..."
   git stash > /dev/null
 fi
-a
+
 yarn test:e2e
 
 if test $diff -eq 1
@@ -17,3 +17,5 @@ then
   echo "Reapplied stashed changes before pushing..."
   git stash pop > /dev/null
 fi
+
+return
