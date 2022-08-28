@@ -80,5 +80,10 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "git diff HEAD --quiet && npm test"
+    }
   }
 }
