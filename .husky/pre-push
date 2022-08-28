@@ -6,12 +6,14 @@ diff=$?
 
 if test $diff -eq 1
 then
-  git stash
+  echo "Stashed local changes before testing..."
+  git stash > /dev/null
 fi
 
 yarn test:e2e
 
 if test $diff -eq 1
 then
-  git stash pop
+  echo "Reapplied stashed changes before pushing..."
+  git stash pop > /dev/null
 fi
