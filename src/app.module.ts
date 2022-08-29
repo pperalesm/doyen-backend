@@ -7,7 +7,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { APP_GUARD } from '@nestjs/core';
-import { MyTypeOrmLogger } from './shared/util/my-typeorm-logger';
+import { MyTypeOrmLogger } from './util/my-typeorm-logger';
+import { SnakeNamingStrategy } from './util/snake-naming-strategy';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MyTypeOrmLogger } from './shared/util/my-typeorm-logger';
       autoLoadEntities: true,
       logging: ['query', 'warn'],
       logger: new MyTypeOrmLogger(),
+      namingStrategy: new SnakeNamingStrategy(),
     }),
     ThrottlerModule.forRoot({
       ttl: 60,
