@@ -10,6 +10,8 @@ import { MyTypeOrmLogger } from '../src/util/my-typeorm-logger';
 import { HttpAdapterHost } from '@nestjs/core';
 import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
 import { SnakeNamingStrategy } from '../src/util/snake-naming-strategy';
+import { AuthModule } from '../src/auth/auth.module';
+import { isHashEqual } from '../src/util/hashing';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -36,6 +38,7 @@ describe('UsersController (e2e)', () => {
           namingStrategy: new SnakeNamingStrategy(),
         }),
         UsersModule,
+        AuthModule,
       ],
     }).compile();
 
@@ -56,9 +59,10 @@ describe('UsersController (e2e)', () => {
   });
 
   it('/ (POST)', async () => {
-    let response = await request(server).post('/users').send({
+    let response = await request(server).post('/auth/signup').send({
       email: 'hola@hola.com',
       nickname: 'pepe',
+      password: 'password1243',
     });
 
     expect(response.status).toEqual(201);
@@ -71,7 +75,6 @@ describe('UsersController (e2e)', () => {
       acceptsEmails: true,
       language: 'en',
       currency: 'usd',
-      timeZone: 'GMT',
       description: null,
       imageUrl: null,
       name: null,
@@ -83,11 +86,12 @@ describe('UsersController (e2e)', () => {
     });
 
     expect(user1).toBeDefined();
+    expect(await isHashEqual('password1243', user1?.password)).toEqual(true);
     expect({ ...user1 }).toStrictEqual({
       id: user1?.id,
       email: 'hola@hola.com',
       nickname: 'pepe',
-      password: null,
+      password: user1?.password,
       name: null,
       imageUrl: null,
       description: null,
@@ -98,25 +102,22 @@ describe('UsersController (e2e)', () => {
       acceptsEmails: true,
       language: 'en',
       currency: 'usd',
-      timeZone: 'GMT',
       bannedUntil: null,
       createdAt: user1?.createdAt,
     });
 
-    const date = new Date();
-    response = await request(server).post('/users').send({
+    response = await request(server).post('/auth/signup').send({
       email: 'adios@adios.com',
       nickname: 'pepe2',
-      password: 'afasfa',
+      password: 'afasfaasdasd',
       name: 'asfasf',
       imageUrl: 'as',
       description: 'as',
       profession: 'null',
       isPublic: true,
       acceptsEmails: false,
-      language: 'asd',
-      currency: 'uasdsd',
-      timeZone: 'asd',
+      language: 'en',
+      currency: 'USD',
     });
 
     expect(response.status).toEqual(201);
@@ -127,9 +128,8 @@ describe('UsersController (e2e)', () => {
       isPublic: true,
       isVerified: false,
       acceptsEmails: false,
-      language: 'asd',
-      currency: 'uasdsd',
-      timeZone: 'asd',
+      language: 'en',
+      currency: 'USD',
       description: 'as',
       imageUrl: 'as',
       name: 'asfasf',
@@ -141,20 +141,20 @@ describe('UsersController (e2e)', () => {
     });
 
     expect(user2).toBeDefined();
+    expect(await isHashEqual('afasfaasdasd', user2?.password)).toEqual(true);
     expect({ ...user2 }).toStrictEqual({
       id: user2?.id,
       email: 'adios@adios.com',
       nickname: 'pepe2',
-      password: 'afasfa',
+      password: user2?.password,
       name: 'asfasf',
       imageUrl: 'as',
       description: 'as',
       profession: 'null',
       isPublic: true,
       acceptsEmails: false,
-      language: 'asd',
-      currency: 'uasdsd',
-      timeZone: 'asd',
+      language: 'en',
+      currency: 'USD',
       bannedUntil: null,
       gains: 0,
       isVerified: false,

@@ -49,9 +49,6 @@ export class User {
   @Column({ default: 'usd' })
   currency!: string;
 
-  @Column({ default: 'GMT' })
-  timeZone!: string;
-
   @Column({ nullable: true })
   bannedUntil?: Date;
 

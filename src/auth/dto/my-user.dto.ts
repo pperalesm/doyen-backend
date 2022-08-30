@@ -7,7 +7,6 @@ export class MyUserDto {
   acceptsEmails: boolean;
   language: string;
   currency: string;
-  timeZone: string;
   name?: string;
   imageUrl?: string;
   description?: string;
@@ -22,7 +21,6 @@ export class MyUserDto {
     acceptsEmails,
     language,
     currency,
-    timeZone,
     name,
     imageUrl,
     description,
@@ -36,7 +34,6 @@ export class MyUserDto {
     acceptsEmails: boolean;
     language: string;
     currency: string;
-    timeZone: string;
     name?: string;
     imageUrl?: string;
     description?: string;
@@ -50,7 +47,6 @@ export class MyUserDto {
     this.acceptsEmails = acceptsEmails;
     this.language = language;
     this.currency = currency;
-    this.timeZone = timeZone;
     this.name = name;
     this.imageUrl = imageUrl;
     this.description = description;

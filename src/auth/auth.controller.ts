@@ -3,21 +3,23 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  HttpException,
 } from '@nestjs/common';
+import { HttpExceptionContent } from '../shared/models/http-exception-content';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { MyUserDto } from './dto/my-user.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('signup')
+  async signUp(@Body() signUpDto: SignUpDto) {
+    const user = await this.authService.signUp(signUpDto);
+    return new MyUserDto({ ...user });
   }
 
   @Get()
@@ -25,14 +27,9 @@ export class AuthController {
     return this.authService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
+  @Get('me')
+  me() {
+    return this.authService.me();
   }
 
   @Delete(':id')
