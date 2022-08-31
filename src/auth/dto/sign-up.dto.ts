@@ -15,10 +15,10 @@ export class SignUpDto {
   @IsString()
   email!: string;
 
-  @MinLength(Constants.NICKNAME_MIN_LENGTH)
-  @MaxLength(Constants.NICKNAME_MAX_LENGTH)
+  @MinLength(Constants.USERNAME_MIN_LENGTH)
+  @MaxLength(Constants.USERNAME_MAX_LENGTH)
   @IsString()
-  nickname!: string;
+  username!: string;
 
   @MinLength(Constants.PASSWORD_MIN_LENGTH)
   @IsString()
@@ -52,11 +52,4 @@ export class SignUpDto {
   @IsString()
   @IsOptional()
   language?: string;
-
-  @IsIn(Constants.VALID_CURRENCIES, {
-    message: Constants.CURRENCY_INVALID_MESSAGE,
-  })
-  @IsString()
-  @IsOptional()
-  currency?: string;
 }

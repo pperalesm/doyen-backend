@@ -14,7 +14,7 @@ export class User {
   email!: string;
 
   @Column({ unique: true })
-  nickname!: string;
+  username!: string;
 
   @Column({ nullable: true })
   password?: string;
@@ -45,9 +45,6 @@ export class User {
 
   @Column({ default: 'en' })
   language!: string;
-
-  @Column({ default: 'usd' })
-  currency!: string;
 
   @Column({ nullable: true })
   bannedUntil?: Date;

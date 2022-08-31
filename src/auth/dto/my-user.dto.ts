@@ -1,12 +1,11 @@
 export class MyUserDto {
   id: string;
   email: string;
-  nickname: string;
+  username: string;
   isPublic: boolean;
   isVerified: boolean;
   acceptsEmails: boolean;
   language: string;
-  currency: string;
   name?: string;
   imageUrl?: string;
   description?: string;
@@ -15,12 +14,11 @@ export class MyUserDto {
   constructor({
     id,
     email,
-    nickname,
+    username,
     isPublic,
     isVerified,
     acceptsEmails,
     language,
-    currency,
     name,
     imageUrl,
     description,
@@ -28,12 +26,11 @@ export class MyUserDto {
   }: {
     id: string;
     email: string;
-    nickname: string;
+    username: string;
     isPublic: boolean;
     isVerified: boolean;
     acceptsEmails: boolean;
     language: string;
-    currency: string;
     name?: string;
     imageUrl?: string;
     description?: string;
@@ -41,12 +38,11 @@ export class MyUserDto {
   }) {
     this.id = id;
     this.email = email;
-    this.nickname = nickname;
+    this.username = username;
     this.isPublic = isPublic;
     this.isVerified = isVerified;
     this.acceptsEmails = acceptsEmails;
     this.language = language;
-    this.currency = currency;
     this.name = name;
     this.imageUrl = imageUrl;
     this.description = description;

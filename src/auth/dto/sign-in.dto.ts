@@ -3,7 +3,7 @@ import { Constants } from '../../shared/constants';
 
 export class SignInDto {
   @IsString()
-  emailOrNickname!: string;
+  username!: string;
 
   @IsString()
   password!: string;

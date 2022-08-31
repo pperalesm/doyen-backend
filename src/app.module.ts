@@ -9,24 +9,15 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { APP_GUARD } from '@nestjs/core';
 import { MyTypeOrmLogger } from './util/my-typeorm-logger';
 import { SnakeNamingStrategy } from './util/snake-naming-strategy';
+import { User } from './database/entities/user.entity';
+import { dataSourceOptions } from './database/typeOrm.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-      autoLoadEntities: true,
-      logging: ['query', 'warn'],
-      logger: new MyTypeOrmLogger(),
-      namingStrategy: new SnakeNamingStrategy(),
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     ThrottlerModule.forRoot({
       ttl: 60,
       limit: 10,
