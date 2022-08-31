@@ -16,7 +16,7 @@ export const dataSourceOptions = {
   logging: ['query', 'warn'],
   logger: new MyTypeOrmLogger(),
   namingStrategy: new SnakeNamingStrategy(),
-  migrations: ['src/database/migrations/*.ts'],
+  migrations: ['src/database/migrations/*.js'],
   entities: [User],
 } as DataSourceOptions;
 

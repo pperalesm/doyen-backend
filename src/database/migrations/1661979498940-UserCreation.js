@@ -1,10 +1,10 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+const { MigrationInterface, QueryRunner } = require("typeorm");
 
-export class UserCreation1661978267701 implements MigrationInterface {
-  name = 'UserCreation1661978267701';
+module.exports = class UserCreation1661979498940 {
+    name = 'UserCreation1661979498940'
 
-  public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
+    async up(queryRunner) {
+        await queryRunner.query(`
             CREATE TABLE "users" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "email" character varying NOT NULL,
@@ -26,11 +26,11 @@ export class UserCreation1661978267701 implements MigrationInterface {
                 CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id")
             )
         `);
-  }
+    }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
+    async down(queryRunner) {
+        await queryRunner.query(`
             DROP TABLE "users"
         `);
-  }
+    }
 }
