@@ -1,51 +1,39 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  HttpException,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { Constants } from '../shared/constants';
-import { HttpExceptionContent } from '../shared/models/http-exception-content';
-import { User } from '../database/entities/user.entity';
+import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { MyUserDto } from './dto/my-user.dto';
-import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
+import { Public } from '../shared/decorators/public.decorator';
+import { LocalGuard } from '../shared/guards/local.guard';
+import { SignInDto } from './dto/sign-in.dto';
+import { AuthUser } from '../shared/decorators/auth-user.decorator';
+import { User } from '../database/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto) {
     const user = await this.authService.signUp(signUpDto);
-    return new MyUserDto({ ...user });
+    return {
+      accessToken: this.authService.signIn(user),
+      user: new MyUserDto({ ...user }),
+    };
   }
 
-  @UseGuards(AuthGuard(Constants.LOCAL_STRATEGY))
+  @Public()
+  @UseGuards(LocalGuard)
   @Post('signin')
-  async signIn(@Body() user: User) {
-    return user;
-  }
-
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  async signIn(@Body() signInDto: SignInDto, @AuthUser() authUser: User) {
+    return {
+      accessToken: this.authService.signIn(authUser),
+      user: new MyUserDto({ ...authUser }),
+    };
   }
 
   @Get('me')
-  me() {
-    return this.authService.me();
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  me(@AuthUser() authUser: User) {
+    return new MyUserDto({ ...authUser });
   }
 }

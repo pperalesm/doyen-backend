@@ -1,5 +1,4 @@
-import { IsString, MinLength } from 'class-validator';
-import { Constants } from '../../shared/constants';
+import { IsString } from 'class-validator';
 
 export class SignInDto {
   @IsString()

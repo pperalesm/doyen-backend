@@ -8,5 +8,4 @@ export const Constants = {
   EMAIL_REGEXP: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
   EMAIL_INVALID_MESSAGE: '$property must be a valid email address',
   VALID_LANGUAGES: ['en', 'es'],
-  LOCAL_STRATEGY: 'local',
 };

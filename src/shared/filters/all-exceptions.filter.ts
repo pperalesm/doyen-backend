@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { HttpExceptionContent } from '../shared/models/http-exception-content';
+import { HttpExceptionContent } from '../models/http-exception-content';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {

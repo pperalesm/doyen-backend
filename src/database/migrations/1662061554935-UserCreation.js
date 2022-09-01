@@ -1,7 +1,7 @@
 const { MigrationInterface, QueryRunner } = require('typeorm');
 
-module.exports = class UserCreation1661980036006 {
-  name = 'UserCreation1661980036006';
+module.exports = class UserCreation1662061554935 {
+  name = 'UserCreation1662061554935';
 
   async up(queryRunner) {
     await queryRunner.query(`
@@ -16,6 +16,7 @@ module.exports = class UserCreation1661980036006 {
                 "profession" character varying,
                 "gains" integer NOT NULL DEFAULT '0',
                 "is_public" boolean NOT NULL DEFAULT false,
+                "is_active" boolean NOT NULL DEFAULT false,
                 "is_verified" boolean NOT NULL DEFAULT false,
                 "accepts_emails" boolean NOT NULL DEFAULT true,
                 "language" character varying NOT NULL DEFAULT 'en',

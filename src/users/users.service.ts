@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '../database/entities/user.entity';
-import { hash } from './../util/hashing';
+import { hash } from '../shared/util/hashing';
 
 @Injectable()
 export class UsersService {

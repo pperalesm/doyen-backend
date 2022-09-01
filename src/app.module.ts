@@ -5,18 +5,14 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { DataSource } from 'typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { LoggerMiddleware } from './middleware/logger.middleware';
+import { LoggerMiddleware } from './shared/middleware/logger.middleware';
 import { APP_GUARD } from '@nestjs/core';
-import { MyTypeOrmLogger } from './util/my-typeorm-logger';
-import { SnakeNamingStrategy } from './util/snake-naming-strategy';
-import { User } from './database/entities/user.entity';
 import { dataSourceOptions } from './database/typeOrm.config';
+import { JwtGuard } from './shared/guards/jwt.guard';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot(dataSourceOptions),
     ThrottlerModule.forRoot({
       ttl: 60,
@@ -30,10 +26,14 @@ import { dataSourceOptions } from './database/typeOrm.config';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
   ],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) {}
+  constructor(private readonly dataSource: DataSource) {}
 
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');

@@ -38,6 +38,9 @@ export class User {
   isPublic!: boolean;
 
   @Column({ default: false })
+  isActive!: boolean;
+
+  @Column({ default: false })
   isVerified!: boolean;
 
   @Column({ default: true })

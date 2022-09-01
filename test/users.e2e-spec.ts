@@ -6,12 +6,12 @@ import { UsersModule } from '../src/users/users.module';
 import { Repository } from 'typeorm';
 import { User } from '../src/database/entities/user.entity';
 import { ConfigModule } from '@nestjs/config';
-import { MyTypeOrmLogger } from '../src/util/my-typeorm-logger';
+import { MyTypeOrmLogger } from '../src/shared/util/my-typeorm-logger';
 import { HttpAdapterHost } from '@nestjs/core';
-import { AllExceptionsFilter } from '../src/filters/all-exceptions.filter';
-import { SnakeNamingStrategy } from '../src/util/snake-naming-strategy';
+import { AllExceptionsFilter } from '../src/shared/filters/all-exceptions.filter';
+import { SnakeNamingStrategy } from '../src/shared/util/snake-naming-strategy';
 import { AuthModule } from '../src/auth/auth.module';
-import { isHashEqual } from '../src/util/hashing';
+import { isHashEqual } from '../src/shared/util/hashing';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;

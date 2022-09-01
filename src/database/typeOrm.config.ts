@@ -1,7 +1,7 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { config } from 'dotenv';
-import { MyTypeOrmLogger } from '../util/my-typeorm-logger';
-import { SnakeNamingStrategy } from '../util/snake-naming-strategy';
+import { MyTypeOrmLogger } from '../shared/util/my-typeorm-logger';
+import { SnakeNamingStrategy } from '../shared/util/snake-naming-strategy';
 import { User } from './entities/user.entity';
 
 config();

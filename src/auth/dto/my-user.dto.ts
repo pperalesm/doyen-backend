@@ -3,6 +3,7 @@ export class MyUserDto {
   email: string;
   username: string;
   isPublic: boolean;
+  isActive: boolean;
   isVerified: boolean;
   acceptsEmails: boolean;
   language: string;
@@ -16,6 +17,7 @@ export class MyUserDto {
     email,
     username,
     isPublic,
+    isActive,
     isVerified,
     acceptsEmails,
     language,
@@ -28,6 +30,7 @@ export class MyUserDto {
     email: string;
     username: string;
     isPublic: boolean;
+    isActive: boolean;
     isVerified: boolean;
     acceptsEmails: boolean;
     language: string;
@@ -40,6 +43,7 @@ export class MyUserDto {
     this.email = email;
     this.username = username;
     this.isPublic = isPublic;
+    this.isActive = isActive;
     this.isVerified = isVerified;
     this.acceptsEmails = acceptsEmails;
     this.language = language;
