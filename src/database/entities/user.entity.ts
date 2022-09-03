@@ -49,6 +49,9 @@ export class User {
   @Column({ default: 'en' })
   language!: string;
 
+  @Column({ nullable: true, type: 'character varying' })
+  refreshToken?: string | null;
+
   @Column({ nullable: true })
   bannedUntil?: Date;
 

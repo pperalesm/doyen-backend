@@ -17,11 +17,6 @@ import { OtherUserDto } from './dto/other-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findOneById(id);
@@ -36,15 +31,5 @@ export class UsersController {
       );
     }
     return new OtherUserDto({ ...user });
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
   }
 }

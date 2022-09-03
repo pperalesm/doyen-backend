@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '../database/entities/user.entity';
-import { hash } from '../shared/util/hashing';
 
 @Injectable()
 export class UsersService {
@@ -13,10 +12,7 @@ export class UsersService {
   ) {}
 
   async create(signUpDto: SignUpDto) {
-    const user = this.usersRepository.create({
-      ...signUpDto,
-      password: await hash(signUpDto.password),
-    });
+    const user = this.usersRepository.create({ ...signUpDto });
     return await this.usersRepository.save(user);
   }
 
@@ -24,19 +20,24 @@ export class UsersService {
     return await this.usersRepository.findOneBy({ id: id });
   }
 
-  async findOneByUsername(username: string) {
-    return await this.usersRepository.findOneBy({ username: username });
+  async findOneByUsernameOrEmail(usernameOrEmail: string) {
+    return await this.usersRepository.findOneBy([
+      { username: usernameOrEmail },
+      { email: usernameOrEmail },
+    ]);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async updateRefreshToken(id: string, refreshToken: string) {
+    return await this.usersRepository.update(
+      { id: id },
+      { refreshToken: refreshToken },
+    );
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async deleteRefreshToken(id: string) {
+    return await this.usersRepository.update(
+      { id: id },
+      { refreshToken: null },
+    );
   }
 }

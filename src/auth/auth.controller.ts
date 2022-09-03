@@ -1,12 +1,11 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Delete } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { MyUserDto } from './dto/my-user.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { Public } from '../shared/decorators/public.decorator';
-import { LocalGuard } from '../shared/guards/local.guard';
 import { SignInDto } from './dto/sign-in.dto';
+import { RefreshDto } from './dto/refresh.dto';
 import { AuthUser } from '../shared/decorators/auth-user.decorator';
-import { User } from '../database/entities/user.entity';
+import { MyUserDto } from './dto/my-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -15,25 +14,24 @@ export class AuthController {
   @Public()
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto) {
-    const user = await this.authService.signUp(signUpDto);
-    return {
-      accessToken: this.authService.signIn(user),
-      user: new MyUserDto({ ...user }),
-    };
+    return await this.authService.signUp(signUpDto);
   }
 
   @Public()
-  @UseGuards(LocalGuard)
   @Post('signin')
-  async signIn(@Body() signInDto: SignInDto, @AuthUser() authUser: User) {
-    return {
-      accessToken: this.authService.signIn(authUser),
-      user: new MyUserDto({ ...authUser }),
-    };
+  async signIn(@Body() signInDto: SignInDto) {
+    return await this.authService.signIn(signInDto);
   }
 
-  @Get('me')
-  me(@AuthUser() authUser: User) {
-    return new MyUserDto({ ...authUser });
+  @Public()
+  @Patch('refresh')
+  async refresh(@Body() refreshDto: RefreshDto) {
+    return await this.authService.refresh(refreshDto);
+  }
+
+  @Delete('signout')
+  async signOut(@AuthUser() authUser: MyUserDto) {
+    console.log(authUser);
+    await this.authService.signOut(authUser);
   }
 }

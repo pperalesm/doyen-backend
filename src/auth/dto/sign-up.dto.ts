@@ -15,6 +15,9 @@ export class SignUpDto {
   @IsString()
   email!: string;
 
+  @Matches(Constants.USERNAME_REGEXP, {
+    message: Constants.USERNAME_INVALID_MESSAGE,
+  })
   @MinLength(Constants.USERNAME_MIN_LENGTH)
   @MaxLength(Constants.USERNAME_MAX_LENGTH)
   @IsString()

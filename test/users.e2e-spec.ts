@@ -11,7 +11,6 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { AllExceptionsFilter } from '../src/shared/filters/all-exceptions.filter';
 import { SnakeNamingStrategy } from '../src/shared/util/snake-naming-strategy';
 import { AuthModule } from '../src/auth/auth.module';
-import { isHashEqual } from '../src/shared/util/hashing';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -85,7 +84,6 @@ describe('UsersController (e2e)', () => {
   //   });
 
   //   expect(user1).toBeDefined();
-  //   expect(await isHashEqual('password1243', user1?.password)).toEqual(true);
   //   expect({ ...user1 }).toStrictEqual({
   //     id: user1?.id,
   //     email: 'hola@hola.com',
@@ -137,7 +135,6 @@ describe('UsersController (e2e)', () => {
   //   });
 
   //   expect(user2).toBeDefined();
-  //   expect(await isHashEqual('afasfaasdasd', user2?.password)).toEqual(true);
   //   expect({ ...user2 }).toStrictEqual({
   //     id: user2?.id,
   //     email: 'adios@adios.com',

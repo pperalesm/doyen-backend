@@ -1,9 +1,9 @@
 import { IsString } from 'class-validator';
 
-export class SignInDto {
+export class RefreshDto {
   @IsString()
-  usernameOrEmail!: string;
+  refreshToken!: string;
 
   @IsString()
-  password!: string;
+  accessToken!: string;
 }
