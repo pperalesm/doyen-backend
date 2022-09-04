@@ -1,15 +1,11 @@
 import {
   Controller,
   Get,
-  Body,
-  Patch,
   Param,
-  Delete,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { HttpExceptionContent } from '../shared/models/http-exception-content';
 import { OtherUserDto } from './dto/other-user.dto';
 

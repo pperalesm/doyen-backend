@@ -3,8 +3,8 @@ export class OtherUserDto {
   username: string;
   isVerified: boolean;
   name?: string;
-  imageUrl?: string;
-  description?: string;
+  avatarUrl?: string;
+  about?: string;
   profession?: string;
 
   constructor({
@@ -12,24 +12,24 @@ export class OtherUserDto {
     username,
     isVerified,
     name,
-    imageUrl,
-    description,
+    avatarUrl,
+    about,
     profession,
   }: {
     id: string;
     username: string;
     isVerified: boolean;
     name?: string;
-    imageUrl?: string;
-    description?: string;
+    avatarUrl?: string;
+    about?: string;
     profession?: string;
   }) {
     this.id = id;
     this.username = username;
     this.isVerified = isVerified;
     this.name = name;
-    this.imageUrl = imageUrl;
-    this.description = description;
+    this.avatarUrl = avatarUrl;
+    this.about = about;
     this.profession = profession;
   }
 }

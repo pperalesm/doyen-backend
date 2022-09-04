@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsDateString,
   IsIn,
   IsOptional,
   IsString,
@@ -23,6 +24,13 @@ export class SignUpDto {
   @IsString()
   username!: string;
 
+  @IsDateString()
+  dateOfBirth!: Date;
+
+  @IsIn(Constants.VALID_GENDERS)
+  @IsString()
+  gender!: string;
+
   @MinLength(Constants.PASSWORD_MIN_LENGTH)
   @IsString()
   password!: string;
@@ -33,11 +41,11 @@ export class SignUpDto {
 
   @IsString()
   @IsOptional()
-  imageUrl?: string;
+  avatarUrl?: string;
 
   @IsString()
   @IsOptional()
-  description?: string;
+  about?: string;
 
   @IsString()
   @IsOptional()

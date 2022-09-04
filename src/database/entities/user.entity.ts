@@ -16,6 +16,12 @@ export class User {
   @Column({ unique: true })
   username!: string;
 
+  @Column()
+  dateOfBirth!: Date;
+
+  @Column({ type: 'character' })
+  gender!: string;
+
   @Column({ nullable: true })
   password?: string;
 
@@ -23,10 +29,10 @@ export class User {
   name?: string;
 
   @Column({ nullable: true })
-  imageUrl?: string;
+  avatarUrl?: string;
 
   @Column({ nullable: true })
-  description?: string;
+  about?: string;
 
   @Column({ nullable: true })
   profession?: string;

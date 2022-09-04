@@ -2,54 +2,62 @@ export class MyUserDto {
   id: string;
   email: string;
   username: string;
+  dateOfBirth: Date;
+  gender: string;
   isPublic: boolean;
   isActive: boolean;
   isVerified: boolean;
   acceptsEmails: boolean;
   language: string;
   name?: string;
-  imageUrl?: string;
-  description?: string;
+  avatarUrl?: string;
+  about?: string;
   profession?: string;
 
   constructor({
     id,
     email,
     username,
+    dateOfBirth,
+    gender,
     isPublic,
     isActive,
     isVerified,
     acceptsEmails,
     language,
     name,
-    imageUrl,
-    description,
+    avatarUrl,
+    about,
     profession,
   }: {
     id: string;
     email: string;
     username: string;
+    dateOfBirth: Date;
+    gender: string;
     isPublic: boolean;
     isActive: boolean;
     isVerified: boolean;
     acceptsEmails: boolean;
     language: string;
     name?: string;
-    imageUrl?: string;
-    description?: string;
+    avatarUrl?: string;
+    about?: string;
     profession?: string;
   }) {
     this.id = id;
     this.email = email;
     this.username = username;
+    this.dateOfBirth = dateOfBirth;
+    this.gender = gender;
     this.isPublic = isPublic;
     this.isActive = isActive;
     this.isVerified = isVerified;
     this.acceptsEmails = acceptsEmails;
     this.language = language;
     this.name = name;
-    this.imageUrl = imageUrl;
-    this.description = description;
+    this.avatarUrl = avatarUrl;
+    this.about = about;
     this.profession = profession;
   }
 }
