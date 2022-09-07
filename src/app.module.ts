@@ -2,16 +2,15 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { DataSource } from 'typeorm';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { LoggerMiddleware } from './shared/middleware/logger.middleware';
 import { APP_GUARD } from '@nestjs/core';
 import { dataSourceOptions } from './database/typeOrm.config';
 import { JwtGuard } from './shared/guards/jwt.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { I18n, I18nContext, I18nModule } from 'nestjs-i18n';
+import { I18nModule } from 'nestjs-i18n';
 
 @Module({
   imports: [

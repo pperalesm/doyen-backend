@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { I18n, I18nService } from 'nestjs-i18n';
 import { DataSource, Repository } from 'typeorm';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
-import { User } from '../database/entities/user.entity';
+import { User } from '../../database/entities/user.entity';
 import { FindAllDto } from './dto/find-all.dto';
 
 @Injectable()

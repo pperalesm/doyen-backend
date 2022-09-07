@@ -7,7 +7,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { HttpExceptionContent } from '../shared/models/http-exception-content';
+import { HttpExceptionContent } from '../../shared/models/http-exception-content';
 import { OtherUserDto } from './dto/other-user.dto';
 import { FindAllDto } from './dto/find-all.dto';
 

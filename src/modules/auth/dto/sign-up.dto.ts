@@ -8,7 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Constants } from '../../shared/constants';
+import { Constants } from '../../../shared/constants';
 
 export class SignUpDto {
   @Matches(Constants.EMAIL_REGEXP, { message: Constants.EMAIL_INVALID_MESSAGE })

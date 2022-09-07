@@ -1,10 +1,10 @@
 import { Controller, Post, Body, Patch, Delete } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
-import { Public } from '../shared/decorators/public.decorator';
+import { Public } from '../../shared/decorators/public.decorator';
 import { SignInDto } from './dto/sign-in.dto';
 import { RefreshDto } from './dto/refresh.dto';
-import { AuthUser } from '../shared/decorators/auth-user.decorator';
+import { AuthUser } from '../../shared/decorators/auth-user.decorator';
 import { MyUserDto } from './dto/my-user.dto';
 
 @Controller('auth')
