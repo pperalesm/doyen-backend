@@ -9,6 +9,9 @@ import { LoggerMiddleware } from './shared/middleware/logger.middleware';
 import { APP_GUARD } from '@nestjs/core';
 import { dataSourceOptions } from './database/typeOrm.config';
 import { JwtGuard } from './shared/guards/jwt.guard';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { I18n, I18nContext, I18nModule } from 'nestjs-i18n';
 
 @Module({
   imports: [
@@ -17,6 +20,33 @@ import { JwtGuard } from './shared/guards/jwt.guard';
     ThrottlerModule.forRoot({
       ttl: 60,
       limit: 10,
+    }),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT!),
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      },
+      template: {
+        dir: __dirname + '/templates',
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+      defaults: {
+        from: process.env.EMAIL_FROM,
+      },
+    }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: __dirname + '/i18n',
+        watch: true,
+      },
     }),
     UsersModule,
     AuthModule,
@@ -33,8 +63,6 @@ import { JwtGuard } from './shared/guards/jwt.guard';
   ],
 })
 export class AppModule {
-  constructor(private readonly dataSource: DataSource) {}
-
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
   }

@@ -1,6 +1,6 @@
 import {
   IsBoolean,
-  IsDateString,
+  IsDate,
   IsIn,
   IsOptional,
   IsString,
@@ -24,7 +24,7 @@ export class SignUpDto {
   @IsString()
   username!: string;
 
-  @IsDateString()
+  @IsDate()
   dateOfBirth!: Date;
 
   @IsIn(Constants.VALID_GENDERS)
