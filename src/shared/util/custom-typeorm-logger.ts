@@ -1,7 +1,7 @@
 import { Logger as NestLogger } from '@nestjs/common';
 import { Logger } from 'typeorm';
 
-export class MyTypeOrmLogger implements Logger {
+export class CustomTypeOrmLogger implements Logger {
   logger = new NestLogger('TypeORM');
 
   logQuery(query: string) {

@@ -1,14 +1,16 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
 import bcrypt from 'bcrypt';
-import { HttpExceptionContent } from '../../shared/models/http-exception-content';
 import { User } from '../../database/entities/user.entity';
 import { randomBytes } from 'crypto';
 import { MyUserDto } from './dto/my-user.dto';
 import { RefreshDto } from './dto/refresh.dto';
+import { ActivateDto } from './dto/activate.dto';
+import { CustomUnauthorized } from '../../shared/exceptions/custom-unauthorized';
+import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 
 @Injectable()
 export class AuthService {
@@ -33,14 +35,7 @@ export class AuthService {
       !(await bcrypt.compare(signInDto.password, user.password)) ||
       (user.bannedUntil && user.bannedUntil.getTime() > Date.now())
     ) {
-      throw new HttpException(
-        new HttpExceptionContent(
-          HttpStatus.UNAUTHORIZED,
-          ['Incorrect username or password'],
-          'Unauthorized',
-        ),
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new CustomUnauthorized(['Incorrect username or password']);
     }
     return await this.generateTokens(user);
   }
@@ -56,14 +51,7 @@ export class AuthService {
       !(await bcrypt.compare(refreshDto.refreshToken, user.refreshToken)) ||
       (user.bannedUntil && user.bannedUntil.getTime() > Date.now())
     ) {
-      throw new HttpException(
-        new HttpExceptionContent(
-          HttpStatus.UNAUTHORIZED,
-          ['Invalid tokens'],
-          'Unauthorized',
-        ),
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new CustomUnauthorized(['Invalid tokens']);
     }
     return await this.generateTokens(user);
   }
@@ -82,5 +70,16 @@ export class AuthService {
 
   async signOut(authUser: MyUserDto) {
     return await this.usersService.deleteRefreshToken(authUser.id);
+  }
+
+  async activate(activateDto: ActivateDto) {
+    const decodedToken = this.jwtService.verify(activateDto.token);
+    const user = await this.usersService.findOneById(decodedToken.id);
+    if (!user) {
+      throw new CustomNotFound(['User not found']);
+    }
+    await this.usersService.activate(decodedToken.id);
+    user.isActive = true;
+    return await this.generateTokens(user);
   }
 }

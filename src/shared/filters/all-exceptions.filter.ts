@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { HttpExceptionContent } from '../models/http-exception-content';
+import { CustomInternalServerError } from '../exceptions/custom-internal-server-error';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -28,11 +28,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const responseBody =
       exception instanceof HttpException
         ? exception.getResponse()
-        : new HttpExceptionContent(
-            HttpStatus.INTERNAL_SERVER_ERROR,
-            ['An unknown error occurred. Please try again later.'],
-            'Internal Server Error',
-          );
+        : new CustomInternalServerError([
+            'An unknown error occurred. Please try again later.',
+          ]);
 
     this.logger.error(exception.stack);
 

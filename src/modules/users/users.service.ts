@@ -6,6 +6,7 @@ import { DataSource, Repository } from 'typeorm';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { User } from '../../database/entities/user.entity';
 import { FindAllDto } from './dto/find-all.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
@@ -14,12 +15,17 @@ export class UsersService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly dataSource: DataSource,
     private readonly emailService: MailerService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async create(signUpDto: SignUpDto) {
     const user = this.usersRepository.create({ ...signUpDto });
     return await this.dataSource.transaction(async (entityManager) => {
       const newUser = await entityManager.save(user);
+      const token = this.jwtService.sign(
+        { id: newUser.id },
+        { expiresIn: '24h' },
+      );
       await this.emailService.sendMail({
         to: newUser.email,
         subject: this.i18n.t('auth.UserActivation', {
@@ -28,7 +34,7 @@ export class UsersService {
         template: `${newUser.language}/user-activation`,
         context: {
           name: newUser.name || newUser.username,
-          url: `doyen.app/auth/activate?token=sdf`,
+          url: `doyen.app/auth/activate?token=${token}`,
         },
       });
       return newUser;
@@ -75,5 +81,15 @@ export class UsersService {
       .take(findAllDto?.take || 10)
       .skip(findAllDto?.skip)
       .getMany();
+  }
+
+  async activate(id: string) {
+    const result = await this.usersRepository
+      .createQueryBuilder()
+      .update()
+      .set({ isActive: true })
+      .where({ id: id })
+      .execute();
+    return result.raw[0];
   }
 }

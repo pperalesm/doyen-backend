@@ -1,15 +1,8 @@
-import {
-  Controller,
-  Get,
-  Param,
-  HttpException,
-  HttpStatus,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { HttpExceptionContent } from '../../shared/models/http-exception-content';
 import { OtherUserDto } from './dto/other-user.dto';
 import { FindAllDto } from './dto/find-all.dto';
+import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 
 @Controller('users')
 export class UsersController {
@@ -19,14 +12,7 @@ export class UsersController {
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findOneById(id);
     if (!user || !user.isPublic) {
-      throw new HttpException(
-        new HttpExceptionContent(
-          HttpStatus.NOT_FOUND,
-          ['User not found'],
-          'Not Found',
-        ),
-        HttpStatus.NOT_FOUND,
-      );
+      throw new CustomNotFound(['User not found']);
     }
     return new OtherUserDto({ ...user });
   }

@@ -1,6 +1,6 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { config } from 'dotenv';
-import { MyTypeOrmLogger } from '../shared/util/my-typeorm-logger';
+import { CustomTypeOrmLogger } from '../shared/util/custom-typeorm-logger';
 import { SnakeNamingStrategy } from '../shared/util/snake-naming-strategy';
 import { User } from './entities/user.entity';
 
@@ -14,7 +14,7 @@ export const dataSourceOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   logging: ['query', 'warn'],
-  logger: new MyTypeOrmLogger(),
+  logger: new CustomTypeOrmLogger(),
   namingStrategy: new SnakeNamingStrategy(),
   migrations: ['src/database/migrations/*.js'],
   entities: [User],
