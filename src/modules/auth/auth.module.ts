@@ -6,12 +6,11 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    UsersModule,
-    PassportModule,
     JwtModule.register({
       privateKey: process.env.JWT_PRIVATE_KEY,
       publicKey: process.env.JWT_PUBLIC_KEY,
@@ -19,6 +18,9 @@ import { JwtStrategy } from './jwt.strategy';
         algorithm: 'RS256',
       },
     }),
+    NotificationsModule,
+    PassportModule,
+    UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

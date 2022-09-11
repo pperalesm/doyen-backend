@@ -14,16 +14,14 @@ import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { MailerService } from '@nestjs-modules/mailer';
-import { I18n, I18nService } from 'nestjs-i18n';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @I18n() private readonly i18n: I18nService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-    private readonly emailService: MailerService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
@@ -92,13 +90,7 @@ export class AuthService {
   }
 
   async resendActivationEmail(authUser: MyUserDto) {
-    await this.usersService.sendActivationEmail(
-      authUser.id,
-      authUser.email,
-      authUser.language,
-      authUser.username,
-      authUser.name,
-    );
+    await this.notificationsService.userActivation(authUser);
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
@@ -108,18 +100,7 @@ export class AuthService {
     if (!user) {
       throw new CustomNotFound(['User not found']);
     }
-    const token = this.jwtService.sign({ id: user.id }, { expiresIn: '15m' });
-    return await this.emailService.sendMail({
-      to: forgotPasswordDto.email,
-      subject: this.i18n.t('auth.PasswordReset', {
-        lang: user.language,
-      }),
-      template: `${user.language}/password-reset`,
-      context: {
-        name: user.name || user.username,
-        url: `doyen.app/auth/password-reset?token=${token}`,
-      },
-    });
+    await this.notificationsService.forgotPassword(user);
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {

@@ -11,6 +11,7 @@ import { JwtGuard } from './shared/guards/jwt.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { I18nModule } from 'nestjs-i18n';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { I18nModule } from 'nestjs-i18n';
         watch: true,
       },
     }),
+    NotificationsModule,
     UsersModule,
     AuthModule,
   ],
