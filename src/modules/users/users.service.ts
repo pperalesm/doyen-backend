@@ -22,21 +22,13 @@ export class UsersService {
     const user = this.usersRepository.create({ ...signUpDto });
     return await this.dataSource.transaction(async (entityManager) => {
       const newUser = await entityManager.save(user);
-      const token = this.jwtService.sign(
-        { id: newUser.id },
-        { expiresIn: '24h' },
+      await this.sendActivationEmail(
+        newUser.id,
+        newUser.email,
+        newUser.language,
+        newUser.username,
+        newUser.name,
       );
-      await this.emailService.sendMail({
-        to: newUser.email,
-        subject: this.i18n.t('auth.UserActivation', {
-          lang: newUser.language,
-        }),
-        template: `${newUser.language}/user-activation`,
-        context: {
-          name: newUser.name || newUser.username,
-          url: `doyen.app/auth/activate?token=${token}`,
-        },
-      });
       return newUser;
     });
   }
@@ -45,6 +37,13 @@ export class UsersService {
     return await this.usersRepository
       .createQueryBuilder()
       .where({ id: id })
+      .getOne();
+  }
+
+  async findOneByEmail(email: string) {
+    return await this.usersRepository
+      .createQueryBuilder()
+      .where({ email: email })
       .getOne();
   }
 
@@ -84,12 +83,41 @@ export class UsersService {
   }
 
   async activate(id: string) {
-    const result = await this.usersRepository
+    return await this.usersRepository
       .createQueryBuilder()
       .update()
       .set({ isActive: true })
       .where({ id: id })
       .execute();
-    return result.raw[0];
+  }
+
+  async updatePassword(id: string, password: string) {
+    return await this.usersRepository
+      .createQueryBuilder()
+      .update()
+      .set({ password: password })
+      .where({ id: id })
+      .execute();
+  }
+
+  async sendActivationEmail(
+    id: string,
+    email: string,
+    language: string,
+    username: string,
+    name?: string,
+  ) {
+    const token = this.jwtService.sign({ id: id }, { expiresIn: '24h' });
+    await this.emailService.sendMail({
+      to: email,
+      subject: this.i18n.t('auth.UserActivation', {
+        lang: language,
+      }),
+      template: `${language}/user-activation`,
+      context: {
+        name: name || username,
+        url: `doyen.app/auth/activate?token=${token}`,
+      },
+    });
   }
 }

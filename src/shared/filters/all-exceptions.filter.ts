@@ -30,7 +30,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getResponse()
         : new CustomInternalServerError([
             'An unknown error occurred. Please try again later.',
-          ]);
+          ]).getResponse();
 
     this.logger.error(exception.stack);
 

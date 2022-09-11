@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UsersService } from '../users/users.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
 import bcrypt from 'bcrypt';
 import { User } from '../../database/entities/user.entity';
@@ -11,12 +11,19 @@ import { RefreshDto } from './dto/refresh.dto';
 import { ActivateDto } from './dto/activate.dto';
 import { CustomUnauthorized } from '../../shared/exceptions/custom-unauthorized';
 import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { I18n, I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @I18n() private readonly i18n: I18nService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly emailService: MailerService,
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
@@ -41,10 +48,10 @@ export class AuthService {
   }
 
   async refresh(refreshDto: RefreshDto) {
-    const decodedAccessToken = this.jwtService.verify(refreshDto.accessToken, {
+    const { id } = this.verifyToken(refreshDto.accessToken, {
       ignoreExpiration: true,
     });
-    const user = await this.usersService.findOneById(decodedAccessToken.id);
+    const user = await this.usersService.findOneById(id);
     if (
       !user ||
       !user.refreshToken ||
@@ -64,6 +71,7 @@ export class AuthService {
       refreshToken: refreshToken,
       accessToken: this.jwtService.sign(
         Object.assign({}, new MyUserDto({ ...user })),
+        { expiresIn: '15m' },
       ),
     };
   }
@@ -73,13 +81,76 @@ export class AuthService {
   }
 
   async activate(activateDto: ActivateDto) {
-    const decodedToken = this.jwtService.verify(activateDto.token);
-    const user = await this.usersService.findOneById(decodedToken.id);
+    const { id } = this.verifyToken(activateDto.token);
+    const user = await this.usersService.findOneById(id);
     if (!user) {
       throw new CustomNotFound(['User not found']);
     }
-    await this.usersService.activate(decodedToken.id);
+    await this.usersService.activate(id);
     user.isActive = true;
     return await this.generateTokens(user);
+  }
+
+  async resendActivationEmail(authUser: MyUserDto) {
+    await this.usersService.sendActivationEmail(
+      authUser.id,
+      authUser.email,
+      authUser.language,
+      authUser.username,
+      authUser.name,
+    );
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    const user = await this.usersService.findOneByEmail(
+      forgotPasswordDto.email,
+    );
+    if (!user) {
+      throw new CustomNotFound(['User not found']);
+    }
+    const token = this.jwtService.sign({ id: user.id }, { expiresIn: '15m' });
+    return await this.emailService.sendMail({
+      to: forgotPasswordDto.email,
+      subject: this.i18n.t('auth.PasswordReset', {
+        lang: user.language,
+      }),
+      template: `${user.language}/password-reset`,
+      context: {
+        name: user.name || user.username,
+        url: `doyen.app/auth/password-reset?token=${token}`,
+      },
+    });
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { id } = this.verifyToken(resetPasswordDto.token);
+    const password = await bcrypt.hash(resetPasswordDto.password, 10);
+    return await this.usersService.updatePassword(id, password);
+  }
+
+  async changePassword(
+    authUser: MyUserDto,
+    changePasswordDto: ChangePasswordDto,
+  ) {
+    const user = await this.usersService.findOneById(authUser.id);
+    if (!user) {
+      throw new CustomNotFound(['User not found']);
+    }
+    if (
+      !user.password ||
+      !(await bcrypt.compare(changePasswordDto.oldPassword, user.password))
+    ) {
+      throw new CustomUnauthorized(['Incorrect password']);
+    }
+    const password = await bcrypt.hash(changePasswordDto.newPassword, 10);
+    return await this.usersService.updatePassword(authUser.id, password);
+  }
+
+  verifyToken(token: string, verifyOptions?: JwtVerifyOptions) {
+    try {
+      return this.jwtService.verify(token, verifyOptions);
+    } catch (e) {
+      throw new CustomUnauthorized(['Invalid token']);
+    }
   }
 }

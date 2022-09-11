@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Delete, Query } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Delete, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { Public } from '../../shared/decorators/public.decorator';
@@ -7,6 +7,9 @@ import { RefreshDto } from './dto/refresh.dto';
 import { AuthUser } from '../../shared/decorators/auth-user.decorator';
 import { MyUserDto } from './dto/my-user.dto';
 import { ActivateDto } from './dto/activate.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -32,13 +35,37 @@ export class AuthController {
 
   @Delete('signout')
   async signOut(@AuthUser() authUser: MyUserDto) {
-    console.log(authUser);
     await this.authService.signOut(authUser);
   }
 
   @Public()
   @Patch('activate')
-  async activate(@Query() activateDto: ActivateDto) {
+  async activate(@Body() activateDto: ActivateDto) {
     return await this.authService.activate(activateDto);
+  }
+
+  @Get('resend-activation-email')
+  async resendActivationEmail(@AuthUser() authUser: MyUserDto) {
+    await this.authService.resendActivationEmail(authUser);
+  }
+
+  @Public()
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    await this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Public()
+  @Patch('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    await this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @Patch('change-password')
+  async changePassword(
+    @AuthUser() authUser: MyUserDto,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    await this.authService.changePassword(authUser, changePasswordDto);
   }
 }
