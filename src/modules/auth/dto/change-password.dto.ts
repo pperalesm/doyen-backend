@@ -1,5 +1,5 @@
 import { IsString, MinLength } from 'class-validator';
-import { Constants } from '../../../shared/constants';
+import { Constants } from '../../../shared/util/constants';
 
 export class ChangePasswordDto {
   @IsString()

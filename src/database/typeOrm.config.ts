@@ -4,6 +4,7 @@ import { CustomTypeOrmLogger } from '../shared/util/custom-typeorm-logger';
 import { SnakeNamingStrategy } from '../shared/util/snake-naming-strategy';
 import { User } from './entities/user.entity';
 import { Notification } from './entities/notification.entity';
+import { Category } from './entities/category.entity';
 
 config();
 
@@ -18,7 +19,7 @@ export const dataSourceOptions = {
   logger: new CustomTypeOrmLogger(),
   namingStrategy: new SnakeNamingStrategy(),
   migrations: ['src/database/migrations/*.js'],
-  entities: [User, Notification],
+  entities: [User, Notification, Category],
 } as DataSourceOptions;
 
 export default new DataSource(dataSourceOptions);

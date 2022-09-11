@@ -2,9 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Category } from './category.entity';
 import { Notification } from './notification.entity';
 
 @Entity('users')
@@ -68,4 +71,8 @@ export class User {
 
   @OneToMany(() => Notification, (notification) => notification.user)
   notifications!: Notification[];
+
+  @ManyToMany(() => Category, (category) => category.users)
+  @JoinTable()
+  categories!: Category[];
 }
