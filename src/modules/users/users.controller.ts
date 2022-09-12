@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { OtherUserDto } from './dto/other-user.dto';
-import { FindAllDto } from './dto/find-all.dto';
+import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 
 @Controller('users')
@@ -14,12 +14,12 @@ export class UsersController {
     if (!user || !user.isPublic) {
       throw new CustomNotFound(['User not found']);
     }
-    return new OtherUserDto({ ...user });
+    return new OtherUserDto(user);
   }
 
   @Get()
-  async findAll(@Query() findAllDto: FindAllDto) {
-    const users = await this.usersService.findAll(findAllDto);
-    return users.map((user) => new OtherUserDto({ ...user }));
+  async findAll(@Query() findAllUsersDto: FindAllUsersDto) {
+    const users = await this.usersService.findAll(findAllUsersDto);
+    return users.map((user) => new OtherUserDto(user));
   }
 }

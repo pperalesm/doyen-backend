@@ -68,7 +68,7 @@ export class AuthService {
     return {
       refreshToken: refreshToken,
       accessToken: this.jwtService.sign(
-        Object.assign({}, new MyUserDto({ ...user })),
+        Object.assign({}, new MyUserDto(user)),
         { expiresIn: '15m' },
       ),
     };

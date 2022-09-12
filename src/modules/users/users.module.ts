@@ -4,9 +4,14 @@ import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../../database/entities/user.entity';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { CategoriesModule } from '../categories/categories.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), NotificationsModule],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    NotificationsModule,
+    CategoriesModule,
+  ],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

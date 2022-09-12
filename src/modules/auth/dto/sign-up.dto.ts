@@ -1,4 +1,6 @@
 import {
+  ArrayMaxSize,
+  IsArray,
   IsBoolean,
   IsDate,
   IsIn,
@@ -63,4 +65,10 @@ export class SignUpDto {
   @IsString()
   @IsOptional()
   language?: string;
+
+  @ArrayMaxSize(Constants.CATEGORYIDS_MAX_SIZE)
+  @IsString({ each: true })
+  @IsArray()
+  @IsOptional()
+  categoryIds?: string[];
 }

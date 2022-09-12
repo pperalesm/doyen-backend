@@ -7,7 +7,7 @@ import {
   Min,
 } from 'class-validator';
 
-export class FindAllDto {
+export class FindAllUsersDto {
   @Min(1)
   @Max(50)
   @IsInt()

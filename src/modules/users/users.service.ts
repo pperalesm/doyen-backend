@@ -3,8 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { User } from '../../database/entities/user.entity';
-import { FindAllDto } from './dto/find-all.dto';
+import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { CategoriesService } from '../categories/categories.service';
+import { Category } from '../../database/entities/category.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,10 +14,20 @@ export class UsersService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly dataSource: DataSource,
     private readonly notificationsService: NotificationsService,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async create(signUpDto: SignUpDto) {
-    let user = this.usersRepository.create({ ...signUpDto });
+    let categories: Category[] = [];
+    if (signUpDto.categoryIds) {
+      categories = await this.categoriesService.findAllById(
+        signUpDto.categoryIds,
+      );
+    }
+    let user = this.usersRepository.create({
+      ...signUpDto,
+      categories: categories,
+    });
     return await this.dataSource.transaction(async (entityManager) => {
       user = await entityManager.save(user);
       await this.notificationsService.userActivation(user);
@@ -26,21 +38,29 @@ export class UsersService {
   async findOneById(id: string) {
     return await this.usersRepository
       .createQueryBuilder()
-      .where({ id: id })
+      .leftJoinAndSelect('User.categories', 'Category')
+      .where('User.id = :id', { id: id })
       .getOne();
   }
 
   async findOneByEmail(email: string) {
     return await this.usersRepository
       .createQueryBuilder()
-      .where({ email: email })
+      .leftJoinAndSelect('User.categories', 'Category')
+      .where('User.email = :email', { email: email })
       .getOne();
   }
 
   async findOneByUsernameOrEmail(usernameOrEmail: string) {
     return await this.usersRepository
       .createQueryBuilder()
-      .where([{ username: usernameOrEmail }, { email: usernameOrEmail }])
+      .leftJoinAndSelect('User.categories', 'Category')
+      .where(
+        'User.username = :usernameOrEmail OR User.email = :usernameOrEmail',
+        {
+          usernameOrEmail: usernameOrEmail,
+        },
+      )
       .getOne();
   }
 
@@ -62,13 +82,14 @@ export class UsersService {
       .execute();
   }
 
-  async findAll(findAllDto: FindAllDto) {
+  async findAll(findAllUsersDto: FindAllUsersDto) {
     return await this.usersRepository
       .createQueryBuilder()
-      .where({ isPublic: true })
-      .orderBy({ gains: 'DESC' })
-      .take(findAllDto?.take || 10)
-      .skip(findAllDto?.skip)
+      .leftJoinAndSelect('User.categories', 'Category')
+      .where('User.isPublic = true')
+      .orderBy('User.gains', 'DESC')
+      .take(findAllUsersDto?.take || 10)
+      .skip(findAllUsersDto?.skip)
       .getMany();
   }
 
