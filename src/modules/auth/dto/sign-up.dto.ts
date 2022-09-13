@@ -6,6 +6,7 @@ import {
   IsIn,
   IsOptional,
   IsString,
+  IsUUID,
   Matches,
   MaxLength,
   MinLength,
@@ -67,6 +68,7 @@ export class SignUpDto {
   language?: string;
 
   @ArrayMaxSize(Constants.CATEGORYIDS_MAX_SIZE)
+  @IsUUID(4, { each: true })
   @IsString({ each: true })
   @IsArray()
   @IsOptional()

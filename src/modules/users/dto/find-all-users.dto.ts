@@ -3,6 +3,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUUID,
   Max,
   Min,
 } from 'class-validator';
@@ -19,8 +20,9 @@ export class FindAllUsersDto {
   @IsOptional()
   skip?: number;
 
+  @IsUUID(4, { each: true })
   @IsString({ each: true })
   @IsArray()
   @IsOptional()
-  categories?: string[];
+  categoryIds?: string[];
 }

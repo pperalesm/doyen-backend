@@ -83,14 +83,32 @@ export class UsersService {
   }
 
   async findAll(findAllUsersDto: FindAllUsersDto) {
-    return await this.usersRepository
-      .createQueryBuilder()
-      .leftJoinAndSelect('User.categories', 'Category')
-      .where('User.isPublic = true')
-      .orderBy('User.gains', 'DESC')
-      .take(findAllUsersDto?.take || 10)
-      .skip(findAllUsersDto?.skip)
-      .getMany();
+    if (findAllUsersDto.categoryIds && findAllUsersDto.categoryIds.length > 0) {
+      return await this.usersRepository
+        .createQueryBuilder()
+        .leftJoinAndSelect('User.categories', 'CategoryToSelect')
+        .leftJoin('User.categories', 'Category')
+        .where('User.isPublic = true AND Category.id IN (:...categoryIds)', {
+          categoryIds: findAllUsersDto.categoryIds,
+        })
+        .groupBy('User.id, CategoryToSelect.id')
+        .having('Count(*) = :numCategories', {
+          numCategories: findAllUsersDto.categoryIds?.length,
+        })
+        .orderBy('User.gains', 'DESC')
+        .take(findAllUsersDto?.take || 10)
+        .skip(findAllUsersDto?.skip)
+        .getMany();
+    } else {
+      return await this.usersRepository
+        .createQueryBuilder()
+        .leftJoinAndSelect('User.categories', 'Category')
+        .where('User.isPublic = true')
+        .orderBy('User.gains', 'DESC')
+        .take(findAllUsersDto?.take || 10)
+        .skip(findAllUsersDto?.skip)
+        .getMany();
+    }
   }
 
   async activate(id: string) {
