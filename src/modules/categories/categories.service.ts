@@ -15,9 +15,11 @@ export class CategoriesService {
   }
 
   async findAllById(ids: string[]) {
-    return await this.categoriesRepository
-      .createQueryBuilder()
-      .where('Category.id IN (:...ids)', { ids: ids })
-      .getMany();
+    return ids.length > 0
+      ? await this.categoriesRepository
+          .createQueryBuilder()
+          .where('Category.id IN (:...ids)', { ids: ids })
+          .getMany()
+      : [];
   }
 }

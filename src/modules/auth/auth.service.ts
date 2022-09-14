@@ -15,6 +15,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { UpdateInfoDto } from './dto/update-info.dto';
 
 @Injectable()
 export class AuthService {
@@ -133,5 +134,10 @@ export class AuthService {
     } catch (e) {
       throw new CustomUnauthorized(['Invalid token']);
     }
+  }
+
+  async updateInfo(authUser: MyUserDto, updateInfoDto: UpdateInfoDto) {
+    const user = await this.usersService.updateOne(authUser, updateInfoDto);
+    return await this.generateTokens(user);
   }
 }

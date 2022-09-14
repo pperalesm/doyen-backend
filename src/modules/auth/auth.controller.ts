@@ -11,6 +11,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Throttle } from '@nestjs/throttler';
+import { UpdateInfoDto } from './dto/update-info.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -69,5 +70,13 @@ export class AuthController {
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
     await this.authService.changePassword(authUser, changePasswordDto);
+  }
+
+  @Patch('update-info')
+  async updateInfo(
+    @AuthUser() authUser: MyUserDto,
+    @Body() updateInfoDto: UpdateInfoDto,
+  ) {
+    return await this.authService.updateInfo(authUser, updateInfoDto);
   }
 }

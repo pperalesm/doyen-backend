@@ -7,6 +7,8 @@ import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CategoriesService } from '../categories/categories.service';
 import { Category } from '../../database/entities/category.entity';
+import { UpdateInfoDto } from '../auth/dto/update-info.dto';
+import { MyUserDto } from '../auth/dto/my-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -83,32 +85,26 @@ export class UsersService {
   }
 
   async findAll(findAllUsersDto: FindAllUsersDto) {
+    let query = this.usersRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('User.categories', 'Category')
+      .where('User.isPublic = true');
     if (findAllUsersDto.categoryIds && findAllUsersDto.categoryIds.length > 0) {
-      return await this.usersRepository
-        .createQueryBuilder()
-        .leftJoinAndSelect('User.categories', 'CategoryToSelect')
-        .leftJoin('User.categories', 'Category')
-        .where('User.isPublic = true AND Category.id IN (:...categoryIds)', {
+      query = query
+        .leftJoin('User.categories', 'AuxCategory')
+        .andWhere('AuxCategory.id IN (:...categoryIds)', {
           categoryIds: findAllUsersDto.categoryIds,
         })
-        .groupBy('User.id, CategoryToSelect.id')
+        .groupBy('User.id, Category.id')
         .having('Count(*) = :numCategories', {
           numCategories: findAllUsersDto.categoryIds?.length,
-        })
-        .orderBy('User.gains', 'DESC')
-        .take(findAllUsersDto?.take || 10)
-        .skip(findAllUsersDto?.skip)
-        .getMany();
-    } else {
-      return await this.usersRepository
-        .createQueryBuilder()
-        .leftJoinAndSelect('User.categories', 'Category')
-        .where('User.isPublic = true')
-        .orderBy('User.gains', 'DESC')
-        .take(findAllUsersDto?.take || 10)
-        .skip(findAllUsersDto?.skip)
-        .getMany();
+        });
     }
+    return await query
+      .orderBy('User.gains', 'DESC')
+      .take(findAllUsersDto?.take || 10)
+      .skip(findAllUsersDto?.skip)
+      .getMany();
   }
 
   async activate(id: string) {
@@ -127,5 +123,20 @@ export class UsersService {
       .set({ password: password })
       .where({ id: id })
       .execute();
+  }
+
+  async updateOne(authUser: MyUserDto, updateInfoDto: UpdateInfoDto) {
+    let categories = authUser.categories;
+    if (updateInfoDto.categoryIds) {
+      categories = await this.categoriesService.findAllById(
+        updateInfoDto.categoryIds,
+      );
+    }
+    const user = this.usersRepository.create({
+      ...authUser,
+      ...updateInfoDto,
+      categories: categories,
+    });
+    return await this.usersRepository.save(user);
   }
 }
