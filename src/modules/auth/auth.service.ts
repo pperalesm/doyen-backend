@@ -6,7 +6,6 @@ import { SignInDto } from './dto/sign-in.dto';
 import bcrypt from 'bcrypt';
 import { User } from '../../database/entities/user.entity';
 import { randomBytes } from 'crypto';
-import { MyUserDto } from './dto/my-user.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { ActivateDto } from './dto/activate.dto';
 import { CustomUnauthorized } from '../../shared/exceptions/custom-unauthorized';
@@ -15,7 +14,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { NotificationsService } from '../notifications/notifications.service';
-import { UpdateInfoDto } from './dto/update-info.dto';
+import { AuthUserDto } from './dto/auth-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -69,14 +68,14 @@ export class AuthService {
     return {
       refreshToken: refreshToken,
       accessToken: this.jwtService.sign(
-        Object.assign({}, new MyUserDto(user)),
+        Object.assign({}, new AuthUserDto(user)),
         { expiresIn: '15m' },
       ),
     };
   }
 
-  async signOut(authUser: MyUserDto) {
-    return await this.usersService.deleteRefreshToken(authUser.id);
+  async signOut(authUser: AuthUserDto) {
+    await this.usersService.deleteRefreshToken(authUser.id);
   }
 
   async activate(activateDto: ActivateDto) {
@@ -90,8 +89,12 @@ export class AuthService {
     return await this.generateTokens(user);
   }
 
-  async resendActivationEmail(authUser: MyUserDto) {
-    await this.notificationsService.userActivation(authUser);
+  async resendActivationEmail(authUser: AuthUserDto) {
+    const user = await this.usersService.findOneById(authUser.id);
+    if (!user) {
+      throw new CustomNotFound(['User not found']);
+    }
+    await this.notificationsService.userActivation(user);
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
@@ -101,17 +104,17 @@ export class AuthService {
     if (!user) {
       throw new CustomNotFound(['User not found']);
     }
-    await this.notificationsService.forgotPassword(user);
+    this.notificationsService.forgotPassword(user);
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { id } = this.verifyToken(resetPasswordDto.token);
     const password = await bcrypt.hash(resetPasswordDto.password, 10);
-    return await this.usersService.updatePassword(id, password);
+    await this.usersService.updatePassword(id, password);
   }
 
   async changePassword(
-    authUser: MyUserDto,
+    authUser: AuthUserDto,
     changePasswordDto: ChangePasswordDto,
   ) {
     const user = await this.usersService.findOneById(authUser.id);
@@ -125,7 +128,7 @@ export class AuthService {
       throw new CustomUnauthorized(['Incorrect password']);
     }
     const password = await bcrypt.hash(changePasswordDto.newPassword, 10);
-    return await this.usersService.updatePassword(authUser.id, password);
+    await this.usersService.updatePassword(authUser.id, password);
   }
 
   verifyToken(token: string, verifyOptions?: JwtVerifyOptions) {
@@ -134,10 +137,5 @@ export class AuthService {
     } catch (e) {
       throw new CustomUnauthorized(['Invalid token']);
     }
-  }
-
-  async updateInfo(authUser: MyUserDto, updateInfoDto: UpdateInfoDto) {
-    const user = await this.usersService.updateOne(authUser, updateInfoDto);
-    return await this.generateTokens(user);
   }
 }

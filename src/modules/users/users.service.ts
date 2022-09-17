@@ -6,9 +6,9 @@ import { User } from '../../database/entities/user.entity';
 import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CategoriesService } from '../categories/categories.service';
-import { Category } from '../../database/entities/category.entity';
-import { UpdateInfoDto } from '../auth/dto/update-info.dto';
-import { MyUserDto } from '../auth/dto/my-user.dto';
+import { UpdateMeDto } from './dto/update-me.dto';
+import { AuthUserDto } from '../auth/dto/auth-user.dto';
+import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 
 @Injectable()
 export class UsersService {
@@ -19,69 +19,16 @@ export class UsersService {
     private readonly categoriesService: CategoriesService,
   ) {}
 
-  async create(signUpDto: SignUpDto) {
-    let categories: Category[] = [];
-    if (signUpDto.categoryIds) {
-      categories = await this.categoriesService.findAllById(
-        signUpDto.categoryIds,
-      );
-    }
-    let user = this.usersRepository.create({
-      ...signUpDto,
-      categories: categories,
-    });
-    return await this.dataSource.transaction(async (entityManager) => {
-      user = await entityManager.save(user);
-      await this.notificationsService.userActivation(user);
-      return user;
-    });
-  }
-
-  async findOneById(id: string) {
-    return await this.usersRepository
+  async findOne(id: string) {
+    const user = await this.usersRepository
       .createQueryBuilder()
       .leftJoinAndSelect('User.categories', 'Category')
       .where('User.id = :id', { id: id })
       .getOne();
-  }
-
-  async findOneByEmail(email: string) {
-    return await this.usersRepository
-      .createQueryBuilder()
-      .leftJoinAndSelect('User.categories', 'Category')
-      .where('User.email = :email', { email: email })
-      .getOne();
-  }
-
-  async findOneByUsernameOrEmail(usernameOrEmail: string) {
-    return await this.usersRepository
-      .createQueryBuilder()
-      .leftJoinAndSelect('User.categories', 'Category')
-      .where(
-        'User.username = :usernameOrEmail OR User.email = :usernameOrEmail',
-        {
-          usernameOrEmail: usernameOrEmail,
-        },
-      )
-      .getOne();
-  }
-
-  async updateRefreshToken(id: string, refreshToken: string) {
-    return await this.usersRepository
-      .createQueryBuilder()
-      .update()
-      .set({ refreshToken: refreshToken })
-      .where({ id: id })
-      .execute();
-  }
-
-  async deleteRefreshToken(id: string) {
-    return await this.usersRepository
-      .createQueryBuilder()
-      .update()
-      .set({ refreshToken: null })
-      .where({ id: id })
-      .execute();
+    if (!user || !user.isPublic) {
+      throw new CustomNotFound(['User not found']);
+    }
+    return user;
   }
 
   async findAll(findAllUsersDto: FindAllUsersDto) {
@@ -107,8 +54,101 @@ export class UsersService {
       .getMany();
   }
 
-  async activate(id: string) {
+  async follow(authUser: AuthUserDto, id: string) {
+    await this.usersRepository
+      .createQueryBuilder()
+      .relation('followed')
+      .of(authUser.id)
+      .add(id);
+  }
+
+  async me(authUser: AuthUserDto) {
+    const user = await this.usersRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('User.categories', 'Category')
+      .where('User.id = :id', { id: authUser.id })
+      .getOne();
+    if (!user) {
+      throw new CustomNotFound(['User not found']);
+    }
+    return user;
+  }
+
+  async updateMe(authUser: AuthUserDto, updateMeDto: UpdateMeDto) {
+    const user = await this.usersRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('User.categories', 'Category')
+      .where('User.id = :id', { id: authUser.id })
+      .getOne();
+    if (!user) {
+      throw new CustomNotFound(['User not found']);
+    }
+    if (updateMeDto.categoryIds) {
+      user.categories = await this.categoriesService.findAllById(
+        updateMeDto.categoryIds,
+      );
+    }
+    return await this.usersRepository.save(user);
+  }
+
+  async create(signUpDto: SignUpDto) {
+    let user = this.usersRepository.create(signUpDto);
+    if (signUpDto.categoryIds) {
+      user.categories = await this.categoriesService.findAllById(
+        signUpDto.categoryIds,
+      );
+    }
+    user = await this.usersRepository.save(user);
+    this.notificationsService.userActivation(user);
+    return user;
+  }
+
+  async findOneById(id: string) {
     return await this.usersRepository
+      .createQueryBuilder()
+      .where('User.id = :id', { id: id })
+      .getOne();
+  }
+
+  async findOneByEmail(email: string) {
+    return await this.usersRepository
+      .createQueryBuilder()
+      .where('User.email = :email', { email: email })
+      .getOne();
+  }
+
+  async findOneByUsernameOrEmail(usernameOrEmail: string) {
+    return await this.usersRepository
+      .createQueryBuilder()
+      .where(
+        'User.username = :usernameOrEmail OR User.email = :usernameOrEmail',
+        {
+          usernameOrEmail: usernameOrEmail,
+        },
+      )
+      .getOne();
+  }
+
+  async updateRefreshToken(id: string, refreshToken: string) {
+    await this.usersRepository
+      .createQueryBuilder()
+      .update()
+      .set({ refreshToken: refreshToken })
+      .where({ id: id })
+      .execute();
+  }
+
+  async deleteRefreshToken(id: string) {
+    await this.usersRepository
+      .createQueryBuilder()
+      .update()
+      .set({ refreshToken: null })
+      .where({ id: id })
+      .execute();
+  }
+
+  async activate(id: string) {
+    await this.usersRepository
       .createQueryBuilder()
       .update()
       .set({ isActive: true })
@@ -117,26 +157,11 @@ export class UsersService {
   }
 
   async updatePassword(id: string, password: string) {
-    return await this.usersRepository
+    await this.usersRepository
       .createQueryBuilder()
       .update()
       .set({ password: password })
       .where({ id: id })
       .execute();
-  }
-
-  async updateOne(authUser: MyUserDto, updateInfoDto: UpdateInfoDto) {
-    let categories = authUser.categories;
-    if (updateInfoDto.categoryIds) {
-      categories = await this.categoriesService.findAllById(
-        updateInfoDto.categoryIds,
-      );
-    }
-    const user = this.usersRepository.create({
-      ...authUser,
-      ...updateInfoDto,
-      categories: categories,
-    });
-    return await this.usersRepository.save(user);
   }
 }

@@ -16,7 +16,7 @@ export class MyUserDto {
   avatarUrl?: string;
   about?: string;
   profession?: string;
-  categories?: Category[];
+  categories!: Category[];
 
   constructor(user: User) {
     this.id = user.id;

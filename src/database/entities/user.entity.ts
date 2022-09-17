@@ -75,4 +75,11 @@ export class User {
   @ManyToMany(() => Category, (category) => category.users)
   @JoinTable()
   categories!: Category[];
+
+  @ManyToMany(() => User, (user) => user.followedUsers)
+  followerUsers!: User[];
+
+  @ManyToMany(() => User, (user) => user.followerUsers)
+  @JoinTable()
+  followedUsers!: User[];
 }

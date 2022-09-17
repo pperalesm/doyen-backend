@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { Constants } from '../../../shared/util/constants';
 
-export class UpdateInfoDto {
+export class UpdateMeDto {
   @IsDate()
   @IsOptional()
   dateOfBirth?: Date;

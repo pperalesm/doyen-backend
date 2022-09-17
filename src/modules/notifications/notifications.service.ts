@@ -6,7 +6,6 @@ import { I18n, I18nService } from 'nestjs-i18n';
 import { Repository } from 'typeorm';
 import { Notification } from '../../database/entities/notification.entity';
 import { User } from '../../database/entities/user.entity';
-import { MyUserDto } from '../auth/dto/my-user.dto';
 
 @Injectable()
 export class NotificationsService {
@@ -18,7 +17,7 @@ export class NotificationsService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async userActivation(user: MyUserDto | User) {
+  async userActivation(user: User) {
     const token = this.jwtService.sign({ id: user.id }, { expiresIn: '24h' });
     await this.emailService.sendMail({
       to: user.email,
@@ -33,7 +32,7 @@ export class NotificationsService {
     });
   }
 
-  async forgotPassword(user: MyUserDto | User) {
+  async forgotPassword(user: User) {
     const token = this.jwtService.sign({ id: user.id }, { expiresIn: '15m' });
     await this.emailService.sendMail({
       to: user.email,
