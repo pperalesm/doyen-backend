@@ -73,13 +73,29 @@ export class User {
   notifications!: Notification[];
 
   @ManyToMany(() => Category, (category) => category.users)
-  @JoinTable()
+  @JoinTable({
+    name: 'users_have_categories',
+    joinColumn: {
+      name: 'user_id',
+    },
+    inverseJoinColumn: {
+      name: 'category_id',
+    },
+  })
   categories!: Category[];
 
   @ManyToMany(() => User, (user) => user.followedUsers)
   followerUsers!: User[];
 
   @ManyToMany(() => User, (user) => user.followerUsers)
-  @JoinTable()
+  @JoinTable({
+    name: 'users_follow_users',
+    joinColumn: {
+      name: 'follower_id',
+    },
+    inverseJoinColumn: {
+      name: 'followed_id',
+    },
+  })
   followedUsers!: User[];
 }

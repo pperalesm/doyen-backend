@@ -42,4 +42,9 @@ export class UsersController {
   async follow(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
     await this.usersService.follow(authUser, id);
   }
+
+  @Patch(':id/unfollow')
+  async unfollow(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
+    await this.usersService.unfollow(authUser, id);
+  }
 }

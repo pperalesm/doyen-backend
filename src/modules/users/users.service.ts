@@ -57,9 +57,17 @@ export class UsersService {
   async follow(authUser: AuthUserDto, id: string) {
     await this.usersRepository
       .createQueryBuilder()
-      .relation('followed')
+      .relation('followedUsers')
       .of(authUser.id)
       .add(id);
+  }
+
+  async unfollow(authUser: AuthUserDto, id: string) {
+    await this.usersRepository
+      .createQueryBuilder()
+      .relation('followedUsers')
+      .of(authUser.id)
+      .remove(id);
   }
 
   async me(authUser: AuthUserDto) {
