@@ -57,7 +57,7 @@ export class UsersService {
   async follow(authUser: AuthUserDto, id: string) {
     await this.usersRepository
       .createQueryBuilder()
-      .relation('followedUsers')
+      .relation('followed')
       .of(authUser.id)
       .add(id);
   }
@@ -65,7 +65,7 @@ export class UsersService {
   async unfollow(authUser: AuthUserDto, id: string) {
     await this.usersRepository
       .createQueryBuilder()
-      .relation('followedUsers')
+      .relation('followed')
       .of(authUser.id)
       .remove(id);
   }
@@ -80,6 +80,22 @@ export class UsersService {
       throw new CustomNotFound(['User not found']);
     }
     return user;
+  }
+
+  async followers(authUser: AuthUserDto) {
+    return await this.usersRepository
+      .createQueryBuilder()
+      .leftJoin('User.followedUsers', 'Followed')
+      .where('Followed.id = :id', { id: authUser.id })
+      .getMany();
+  }
+
+  async followed(authUser: AuthUserDto) {
+    return await this.usersRepository
+      .createQueryBuilder()
+      .leftJoin('User.followerUsers', 'Follower')
+      .where('Follower.id = :id', { id: authUser.id })
+      .getMany();
   }
 
   async updateMe(authUser: AuthUserDto, updateMeDto: UpdateMeDto) {

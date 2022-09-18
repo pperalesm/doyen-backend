@@ -8,7 +8,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Category } from './category.entity';
+import { Collaboration } from './collaboration.entity';
+import { Meeting } from './meeting.entity';
 import { Notification } from './notification.entity';
+import { Purchase } from './purchase.entity';
 
 @Entity('users')
 export class User {
@@ -42,7 +45,7 @@ export class User {
   @Column({ nullable: true })
   profession?: string;
 
-  @Column({ default: 0 })
+  @Column({ type: 'float', default: 0 })
   gains!: number;
 
   @Column({ default: false })
@@ -98,4 +101,37 @@ export class User {
     },
   })
   followedUsers!: User[];
+
+  @OneToMany(() => Meeting, (meeting) => meeting.creatorUser)
+  createdMeetings!: Meeting[];
+
+  @ManyToMany(() => Meeting, (meeting) => meeting.followerUsers)
+  @JoinTable({
+    name: 'users_follow_meetings',
+    joinColumn: {
+      name: 'user_id',
+    },
+    inverseJoinColumn: {
+      name: 'meeting_id',
+    },
+  })
+  followedMeetings!: Meeting[];
+
+  @ManyToMany(() => Meeting, (meeting) => meeting.attendeeUsers)
+  @JoinTable({
+    name: 'users_attend_meetings',
+    joinColumn: {
+      name: 'user_id',
+    },
+    inverseJoinColumn: {
+      name: 'meeting_id',
+    },
+  })
+  attendedMeetings!: Meeting[];
+
+  @OneToMany(() => Collaboration, (collaboration) => collaboration.user)
+  collaborations!: Collaboration[];
+
+  @OneToMany(() => Purchase, (purchase) => purchase.user)
+  purchases!: Purchase[];
 }

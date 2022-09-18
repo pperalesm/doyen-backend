@@ -23,6 +23,18 @@ export class UsersController {
     return new MyUserDto(user);
   }
 
+  @Get('followers')
+  async followers(@AuthUser() authUser: AuthUserDto) {
+    const users = await this.usersService.followers(authUser);
+    return users.map((user) => new OtherUserDto(user));
+  }
+
+  @Get('followed')
+  async followed(@AuthUser() authUser: AuthUserDto) {
+    const users = await this.usersService.followed(authUser);
+    return users.map((user) => new OtherUserDto(user));
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findOne(id);

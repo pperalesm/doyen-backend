@@ -5,28 +5,26 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Meeting } from './meeting.entity';
 import { User } from './user.entity';
 
-@Entity('notifications')
-export class Notification {
+@Entity('purchases')
+export class Purchase {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
-
-  @Column()
-  title!: string;
-
-  @Column()
-  message!: string;
-
-  @Column({ nullable: true })
-  readAt!: Date;
 
   @CreateDateColumn()
   createdAt!: Date;
 
-  @ManyToOne(() => User, (user) => user.notifications)
+  @ManyToOne(() => User, (user) => user.purchases)
   user!: User;
 
   @Column()
   userId!: string;
+
+  @ManyToOne(() => Meeting, (meeting) => meeting.purchases)
+  meeting!: Meeting;
+
+  @Column()
+  meetingId!: string;
 }

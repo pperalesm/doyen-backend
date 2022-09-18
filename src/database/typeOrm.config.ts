@@ -5,6 +5,13 @@ import { SnakeNamingStrategy } from '../shared/util/snake-naming-strategy';
 import { User } from './entities/user.entity';
 import { Notification } from './entities/notification.entity';
 import { Category } from './entities/category.entity';
+import { Meeting } from './entities/meeting.entity';
+import { Bid } from './entities/bid.entity';
+import { Collaboration } from './entities/collaboration.entity';
+import { Description } from './entities/description.entity';
+import { Image } from './entities/image.entity';
+import { Purchase } from './entities/purchase.entity';
+import { Step } from './entities/step.entity';
 
 config();
 
@@ -19,7 +26,18 @@ export const dataSourceOptions = {
   logger: new CustomTypeOrmLogger(),
   namingStrategy: new SnakeNamingStrategy(),
   migrations: ['src/database/migrations/*.js'],
-  entities: [User, Notification, Category],
+  entities: [
+    User,
+    Notification,
+    Category,
+    Meeting,
+    Bid,
+    Collaboration,
+    Description,
+    Image,
+    Purchase,
+    Step,
+  ],
 } as DataSourceOptions;
 
 export default new DataSource(dataSourceOptions);
