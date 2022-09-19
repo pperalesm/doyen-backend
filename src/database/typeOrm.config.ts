@@ -8,8 +8,6 @@ import { Category } from './entities/category.entity';
 import { Meeting } from './entities/meeting.entity';
 import { Bid } from './entities/bid.entity';
 import { Collaboration } from './entities/collaboration.entity';
-import { Description } from './entities/description.entity';
-import { Image } from './entities/image.entity';
 import { Purchase } from './entities/purchase.entity';
 import { Step } from './entities/step.entity';
 
@@ -33,8 +31,6 @@ export const dataSourceOptions = {
     Meeting,
     Bid,
     Collaboration,
-    Description,
-    Image,
     Purchase,
     Step,
   ],

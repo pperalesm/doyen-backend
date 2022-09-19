@@ -1,7 +1,7 @@
 const { MigrationInterface, QueryRunner } = require('typeorm');
 
-module.exports = class AllEntitiesCreation1663513081333 {
-  name = 'AllEntitiesCreation1663513081333';
+module.exports = class AllEntitiesCreation1663607069734 {
+  name = 'AllEntitiesCreation1663607069734';
 
   async up(queryRunner) {
     await queryRunner.query(`
@@ -12,20 +12,6 @@ module.exports = class AllEntitiesCreation1663513081333 {
                 "user_id" uuid NOT NULL,
                 "meeting_id" uuid NOT NULL,
                 CONSTRAINT "PK_6d843532637cb55b078793e6811" PRIMARY KEY ("id")
-            )
-        `);
-    await queryRunner.query(`
-            CREATE TABLE "descriptions" (
-                "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-                "body" character varying NOT NULL,
-                CONSTRAINT "PK_5000c6760d45a086993eec92ded" PRIMARY KEY ("id")
-            )
-        `);
-    await queryRunner.query(`
-            CREATE TABLE "images" (
-                "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-                "url" character varying NOT NULL,
-                CONSTRAINT "PK_1fe148074c6a1a91b63cb9ee3c9" PRIMARY KEY ("id")
             )
         `);
     await queryRunner.query(`
@@ -57,11 +43,15 @@ module.exports = class AllEntitiesCreation1663513081333 {
         `);
     await queryRunner.query(`
             ALTER TABLE "meetings"
-            ADD "image_id" uuid NOT NULL
+            ADD "image_url" character varying
         `);
     await queryRunner.query(`
             ALTER TABLE "meetings"
-            ADD "description_id" uuid NOT NULL
+            ADD "description" character varying
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "meetings"
+            ALTER COLUMN "published_at" DROP NOT NULL
         `);
     await queryRunner.query(`
             ALTER TABLE "collaborations"
@@ -78,14 +68,6 @@ module.exports = class AllEntitiesCreation1663513081333 {
     await queryRunner.query(`
             ALTER TABLE "purchases"
             ADD CONSTRAINT "FK_59b55200ed4f1b3fea0948bc531" FOREIGN KEY ("meeting_id") REFERENCES "meetings"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
-        `);
-    await queryRunner.query(`
-            ALTER TABLE "meetings"
-            ADD CONSTRAINT "FK_acc882c86800454cd7ac416cf7b" FOREIGN KEY ("image_id") REFERENCES "images"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
-        `);
-    await queryRunner.query(`
-            ALTER TABLE "meetings"
-            ADD CONSTRAINT "FK_40760eafc4dcf357b6aadf39c5f" FOREIGN KEY ("description_id") REFERENCES "descriptions"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
         `);
     await queryRunner.query(`
             ALTER TABLE "steps"
@@ -112,12 +94,6 @@ module.exports = class AllEntitiesCreation1663513081333 {
             ALTER TABLE "steps" DROP CONSTRAINT "FK_73c9f7972468367bb071b513352"
         `);
     await queryRunner.query(`
-            ALTER TABLE "meetings" DROP CONSTRAINT "FK_40760eafc4dcf357b6aadf39c5f"
-        `);
-    await queryRunner.query(`
-            ALTER TABLE "meetings" DROP CONSTRAINT "FK_acc882c86800454cd7ac416cf7b"
-        `);
-    await queryRunner.query(`
             ALTER TABLE "purchases" DROP CONSTRAINT "FK_59b55200ed4f1b3fea0948bc531"
         `);
     await queryRunner.query(`
@@ -130,10 +106,15 @@ module.exports = class AllEntitiesCreation1663513081333 {
             ALTER TABLE "collaborations" DROP CONSTRAINT "FK_80fc2181fccbdc292965674825f"
         `);
     await queryRunner.query(`
-            ALTER TABLE "meetings" DROP COLUMN "description_id"
+            ALTER TABLE "meetings"
+            ALTER COLUMN "published_at"
+            SET NOT NULL
         `);
     await queryRunner.query(`
-            ALTER TABLE "meetings" DROP COLUMN "image_id"
+            ALTER TABLE "meetings" DROP COLUMN "description"
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "meetings" DROP COLUMN "image_url"
         `);
     await queryRunner.query(`
             DROP TABLE "bids"
@@ -143,12 +124,6 @@ module.exports = class AllEntitiesCreation1663513081333 {
         `);
     await queryRunner.query(`
             DROP TABLE "purchases"
-        `);
-    await queryRunner.query(`
-            DROP TABLE "images"
-        `);
-    await queryRunner.query(`
-            DROP TABLE "descriptions"
         `);
     await queryRunner.query(`
             DROP TABLE "collaborations"

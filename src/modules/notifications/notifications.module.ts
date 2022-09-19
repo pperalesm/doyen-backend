@@ -4,6 +4,7 @@ import { NotificationsService } from './notifications.service';
 import { Notification } from '../../database/entities/notification.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { NotificationsController } from './notifications.controller';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
       },
     }),
   ],
+  controllers: [NotificationsController],
   providers: [NotificationsService],
   exports: [NotificationsService],
 })

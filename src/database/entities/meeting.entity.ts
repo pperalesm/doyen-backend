@@ -10,8 +10,6 @@ import {
 } from 'typeorm';
 import { Category } from './category.entity';
 import { Collaboration } from './collaboration.entity';
-import { Description } from './description.entity';
-import { Image } from './image.entity';
 import { Purchase } from './purchase.entity';
 import { User } from './user.entity';
 
@@ -41,8 +39,8 @@ export class Meeting {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @Column()
-  publishedAt!: Date;
+  @Column({ nullable: true })
+  publishedAt?: Date;
 
   @Column()
   openedAt!: Date;
@@ -59,17 +57,11 @@ export class Meeting {
   @Column({ nullable: true })
   cancelledAt!: Date;
 
-  @ManyToOne(() => Image, (image) => image.meetings)
-  image!: Image;
+  @Column({ nullable: true })
+  imageUrl?: string;
 
-  @Column()
-  imageId!: string;
-
-  @ManyToOne(() => Description, (description) => description.meetings)
-  description!: Description;
-
-  @Column()
-  descriptionId!: string;
+  @Column({ nullable: true })
+  description?: string;
 
   @ManyToOne(() => User, (user) => user.createdMeetings)
   creatorUser!: User;

@@ -13,6 +13,11 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { I18nModule } from 'nestjs-i18n';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { MeetingsModule } from './modules/meetings/meetings.module';
+import { CollaborationsModule } from './modules/collaborations/collaborations.module';
+import { PurchasesModule } from './modules/purchases/purchases.module';
+import { BidsModule } from './modules/bids/bids.module';
+import { StepsModule } from './modules/steps/steps.module';
 
 @Module({
   imports: [
@@ -53,6 +58,11 @@ import { CategoriesModule } from './modules/categories/categories.module';
     CategoriesModule,
     UsersModule,
     AuthModule,
+    MeetingsModule,
+    CollaborationsModule,
+    PurchasesModule,
+    BidsModule,
+    StepsModule,
   ],
   providers: [
     {
