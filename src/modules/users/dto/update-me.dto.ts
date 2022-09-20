@@ -49,9 +49,9 @@ export class UpdateMeDto {
   @IsOptional()
   language?: string;
 
-  @ArrayMaxSize(Constants.CATEGORYIDS_MAX_SIZE)
   @IsUUID(4, { each: true })
   @IsString({ each: true })
+  @ArrayMaxSize(Constants.CATEGORYIDS_MAX_SIZE)
   @IsArray()
   @IsOptional()
   categoryIds?: string[];
