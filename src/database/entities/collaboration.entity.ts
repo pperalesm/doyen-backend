@@ -1,8 +1,15 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Meeting } from './meeting.entity';
 import { User } from './user.entity';
 
 @Entity('collaborations')
+@Index(['userId', 'meetingId'], { unique: true })
 export class Collaboration {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

@@ -1,7 +1,7 @@
 const { MigrationInterface, QueryRunner } = require('typeorm');
 
-module.exports = class AllEntitiesCreation1663607069734 {
-  name = 'AllEntitiesCreation1663607069734';
+module.exports = class AllEntitiesCreation1663780976623 {
+  name = 'AllEntitiesCreation1663780976623';
 
   async up(queryRunner) {
     await queryRunner.query(`
@@ -13,6 +13,9 @@ module.exports = class AllEntitiesCreation1663607069734 {
                 "meeting_id" uuid NOT NULL,
                 CONSTRAINT "PK_6d843532637cb55b078793e6811" PRIMARY KEY ("id")
             )
+        `);
+    await queryRunner.query(`
+            CREATE UNIQUE INDEX "IDX_a4bf1dd2728e67ae42d52b4e54" ON "collaborations" ("user_id", "meeting_id")
         `);
     await queryRunner.query(`
             CREATE TABLE "purchases" (
@@ -52,6 +55,18 @@ module.exports = class AllEntitiesCreation1663607069734 {
     await queryRunner.query(`
             ALTER TABLE "meetings"
             ALTER COLUMN "published_at" DROP NOT NULL
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "meetings"
+            ALTER COLUMN "opened_at" DROP NOT NULL
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "meetings"
+            ALTER COLUMN "phase_at" DROP NOT NULL
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "meetings"
+            ALTER COLUMN "closed_at" DROP NOT NULL
         `);
     await queryRunner.query(`
             ALTER TABLE "collaborations"
@@ -107,6 +122,21 @@ module.exports = class AllEntitiesCreation1663607069734 {
         `);
     await queryRunner.query(`
             ALTER TABLE "meetings"
+            ALTER COLUMN "closed_at"
+            SET NOT NULL
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "meetings"
+            ALTER COLUMN "phase_at"
+            SET NOT NULL
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "meetings"
+            ALTER COLUMN "opened_at"
+            SET NOT NULL
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "meetings"
             ALTER COLUMN "published_at"
             SET NOT NULL
         `);
@@ -124,6 +154,9 @@ module.exports = class AllEntitiesCreation1663607069734 {
         `);
     await queryRunner.query(`
             DROP TABLE "purchases"
+        `);
+    await queryRunner.query(`
+            DROP INDEX "public"."IDX_a4bf1dd2728e67ae42d52b4e54"
         `);
     await queryRunner.query(`
             DROP TABLE "collaborations"

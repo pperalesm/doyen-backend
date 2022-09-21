@@ -115,7 +115,7 @@ export class UsersService {
     return await this.usersRepository.save(user);
   }
 
-  async create(signUpDto: SignUpDto) {
+  async createOne(signUpDto: SignUpDto) {
     let user = this.usersRepository.create(signUpDto);
     if (signUpDto.categoryIds) {
       user.categories = await this.categoriesService.findAllById(
@@ -130,6 +130,14 @@ export class UsersService {
   async findOneById(id: string) {
     return await this.usersRepository
       .createQueryBuilder()
+      .where('User.id = :id', { id: id })
+      .getOne();
+  }
+
+  async findOneByIdWithCategories(id: string) {
+    return await this.usersRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('User.categories', 'Category')
       .where('User.id = :id', { id: id })
       .getOne();
   }

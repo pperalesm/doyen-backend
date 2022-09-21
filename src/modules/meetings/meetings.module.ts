@@ -7,6 +7,8 @@ import { MeetingsService } from './meetings.service';
 import { MeetingsController } from './meetings.controller';
 import { BidsModule } from '../bids/bids.module';
 import { PurchasesModule } from '../purchases/purchases.module';
+import { CollaborationsModule } from '../collaborations/collaborations.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { PurchasesModule } from '../purchases/purchases.module';
     CategoriesModule,
     BidsModule,
     PurchasesModule,
+    CollaborationsModule,
+    UsersModule,
   ],
   controllers: [MeetingsController],
   providers: [MeetingsService],

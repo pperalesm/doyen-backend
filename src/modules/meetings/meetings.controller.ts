@@ -17,18 +17,25 @@ export class MeetingsController {
     @Body() createMeetingDto: CreateMeetingDto,
   ) {
     const validationErrors: string[] = [];
-    if (createMeetingDto.collaborations) {
+    if (createMeetingDto.collaborationsInfo) {
       if (
-        createMeetingDto.collaborations.length +
+        createMeetingDto.collaborationsInfo.length +
           createMeetingDto.maxParticipants >
         Constants.PARTICIPANTS_MAX
       ) {
         validationErrors.push(Constants.PARTICIPANTS_INVALID_MESSAGE);
       }
-      for (const collaboration of createMeetingDto.collaborations) {
+      let percentageSum = 0;
+      for (const collaboration of createMeetingDto.collaborationsInfo) {
         if (collaboration.userId === authUser.id) {
           validationErrors.push(Constants.COLLABORATION_INVALID_MESSAGE);
         }
+        percentageSum += collaboration.percentage;
+      }
+      if (percentageSum > 100) {
+        validationErrors.push(
+          Constants.COLLABORATION_PERCENTAGE_INVALID_MESSAGE,
+        );
       }
     }
     if (createMeetingDto.scheduledAt.getTime() <= Date.now()) {
@@ -37,7 +44,11 @@ export class MeetingsController {
     if (validationErrors.length > 0) {
       throw new CustomBadRequest(validationErrors);
     }
-    return;
+    const meeting = await this.meetingsService.createMeeting(
+      authUser,
+      createMeetingDto,
+    );
+    return meeting;
   }
 
   @Post('auction-meeting')

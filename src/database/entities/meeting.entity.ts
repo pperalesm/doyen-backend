@@ -42,20 +42,20 @@ export class Meeting {
   @Column({ nullable: true })
   publishedAt?: Date;
 
-  @Column()
-  openedAt!: Date;
+  @Column({ nullable: true })
+  openedAt?: Date;
 
-  @Column()
-  phaseAt!: Date;
+  @Column({ nullable: true })
+  phaseAt?: Date;
 
-  @Column()
-  closedAt!: Date;
+  @Column({ nullable: true })
+  closedAt?: Date;
 
   @Column()
   scheduledAt!: Date;
 
   @Column({ nullable: true })
-  cancelledAt!: Date;
+  cancelledAt?: Date;
 
   @Column({ nullable: true })
   imageUrl?: string;

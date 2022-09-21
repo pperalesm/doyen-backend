@@ -26,7 +26,7 @@ export class AuthService {
 
   async signUp(signUpDto: SignUpDto) {
     signUpDto.password = await bcrypt.hash(signUpDto.password, 10);
-    const user = await this.usersService.create(signUpDto);
+    const user = await this.usersService.createOne(signUpDto);
     return await this.generateTokens(user);
   }
 

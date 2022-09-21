@@ -24,4 +24,6 @@ export const Constants = {
   SCHEDULED_AT_INVALID_MESSAGE: 'scheduledAt must be a future date',
   COLLABORATION_INVALID_MESSAGE:
     'You cannot be present within the collaborations',
+  COLLABORATION_PERCENTAGE_INVALID_MESSAGE:
+    'The sum of all percentages must not be greater than 100',
 };

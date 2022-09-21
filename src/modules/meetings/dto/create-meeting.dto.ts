@@ -1,9 +1,11 @@
+import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
   IsDate,
   IsInt,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   IsUUID,
@@ -56,7 +58,8 @@ export class CreateMeetingDto {
   categoryIds?: string[];
 
   @ValidateNested({ each: true })
+  @Type(() => CollaborationDto)
   @IsArray()
   @IsOptional()
-  collaborations?: CollaborationDto[];
+  collaborationsInfo?: CollaborationDto[];
 }
