@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
+  IsBoolean,
   IsDate,
   IsInt,
   IsNumber,
@@ -14,11 +15,14 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Constants } from '../../../shared/util/constants';
-import { CollaborationDto } from './collaboration.dto';
+import { CreateCollaborationDto } from '../../collaborations/dto/create-collaboration.dto';
 
 export class CreateMeetingDto {
   @IsString()
   title!: string;
+
+  @IsBoolean()
+  isAuction!: boolean;
 
   @Min(Constants.BASE_PRICE_MIN)
   @IsNumber()
@@ -58,8 +62,8 @@ export class CreateMeetingDto {
   categoryIds?: string[];
 
   @ValidateNested({ each: true })
-  @Type(() => CollaborationDto)
+  @Type(() => CreateCollaborationDto)
   @IsArray()
   @IsOptional()
-  collaborationsInfo?: CollaborationDto[];
+  collaborationsInfo?: CreateCollaborationDto[];
 }

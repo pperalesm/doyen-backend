@@ -8,6 +8,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Bid } from './bid.entity';
 import { Category } from './category.entity';
 import { Collaboration } from './collaboration.entity';
 import { Purchase } from './purchase.entity';
@@ -46,7 +47,7 @@ export class Meeting {
   openedAt?: Date;
 
   @Column({ nullable: true })
-  phaseAt?: Date;
+  phasedAt?: Date;
 
   @Column({ nullable: true })
   closedAt?: Date;
@@ -92,4 +93,7 @@ export class Meeting {
 
   @OneToMany(() => Purchase, (purchase) => purchase.meeting)
   purchases!: Purchase[];
+
+  @OneToMany(() => Bid, (bids) => bids.meeting)
+  bids!: Bid[];
 }

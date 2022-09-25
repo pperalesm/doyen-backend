@@ -12,6 +12,7 @@ import { AuthUserDto } from '../auth/dto/auth-user.dto';
 import { Category } from '../../database/entities/category.entity';
 import { UsersService } from '../users/users.service';
 import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
+import { CustomInternalServerError } from '../../shared/exceptions/custom-internal-server-error';
 
 @Injectable()
 export class MeetingsService {
@@ -19,7 +20,6 @@ export class MeetingsService {
     @InjectRepository(Meeting)
     private readonly meetingsRepository: Repository<Meeting>,
     private readonly collaborationsService: CollaborationsService,
-    private readonly usersService: UsersService,
     private readonly categoriesService: CategoriesService,
     private readonly dataSource: DataSource,
     private readonly notificationsService: NotificationsService,
@@ -27,38 +27,56 @@ export class MeetingsService {
     private readonly purchasesService: PurchasesService,
   ) {}
 
-  async createMeeting(
-    authUser: AuthUserDto,
-    createMeetingDto: CreateMeetingDto,
-  ) {
-    const [user, categories] = await Promise.all([
-      this.usersService.findOneByIdWithCategories(authUser.id),
-      createMeetingDto.categoryIds
-        ? this.categoriesService.findAllById(createMeetingDto.categoryIds)
-        : ([] as Category[]),
-    ]);
-    if (!user) {
-      throw new CustomNotFound(['User not found']);
-    }
+  async createOne(authUser: AuthUserDto, createMeetingDto: CreateMeetingDto) {
     let meeting = this.meetingsRepository.create({
       ...createMeetingDto,
-      isAuction: false,
-      creatorUser: user,
-      categories: categories,
+      creatorUserId: authUser.id,
     });
+    if (createMeetingDto.categoryIds) {
+      meeting.categories = await this.categoriesService.findAllById(
+        createMeetingDto.categoryIds,
+      );
+    }
+    if (createMeetingDto.isAuction) {
+      const msInDay = 1000 * 60 * 60 * 24;
+      meeting.openedAt = new Date(meeting.scheduledAt.getTime() - msInDay * 3);
+      meeting.phasedAt = new Date(meeting.scheduledAt.getTime() - msInDay * 2);
+      meeting.closedAt = new Date(meeting.scheduledAt.getTime() - msInDay * 1);
+    }
     if (!createMeetingDto.collaborationsInfo) {
       meeting.publishedAt = new Date();
     }
     await this.dataSource.transaction(async (entityManager) => {
       meeting = await entityManager.getRepository(Meeting).save(meeting);
       if (createMeetingDto.collaborationsInfo) {
-        meeting.collaborations = await this.collaborationsService.createMany(
+        await this.collaborationsService.createMany(
           createMeetingDto.collaborationsInfo,
           meeting.id,
           entityManager,
         );
       }
     });
-    return meeting;
+    let query = this.meetingsRepository.createQueryBuilder();
+    if (
+      createMeetingDto.categoryIds &&
+      createMeetingDto.categoryIds.length > 0
+    ) {
+      query = query.leftJoinAndSelect('Meeting.categories', 'Category');
+    }
+    if (
+      createMeetingDto.collaborationsInfo &&
+      createMeetingDto.collaborationsInfo.length > 0
+    ) {
+      query = query
+        .leftJoinAndSelect('Meeting.collaborations', 'Collaboration')
+        .leftJoinAndSelect('Collaboration.user', 'CollaborationUser');
+    }
+    const newMeeting = await query
+      .where('Meeting.id = :id', { id: meeting.id })
+      .getOne();
+    if (!newMeeting) {
+      throw new CustomInternalServerError();
+    }
+    return newMeeting;
   }
 }

@@ -28,9 +28,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const responseBody =
       exception instanceof HttpException
         ? exception.getResponse()
-        : new CustomInternalServerError([
-            'An unknown error occurred. Please try again later.',
-          ]).getResponse();
+        : new CustomInternalServerError().getResponse();
 
     this.logger.error(exception.stack);
 

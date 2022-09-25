@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { User } from '../../database/entities/user.entity';
 import { FindAllUsersDto } from './dto/find-all-users.dto';
@@ -9,12 +9,12 @@ import { CategoriesService } from '../categories/categories.service';
 import { UpdateMeDto } from './dto/update-me.dto';
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
 import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
+import { CustomInternalServerError } from '../../shared/exceptions/custom-internal-server-error';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
-    private readonly dataSource: DataSource,
     private readonly notificationsService: NotificationsService,
     private readonly categoriesService: CategoriesService,
   ) {}
@@ -99,20 +99,25 @@ export class UsersService {
   }
 
   async updateMe(authUser: AuthUserDto, updateMeDto: UpdateMeDto) {
-    const user = await this.usersRepository
-      .createQueryBuilder()
-      .leftJoinAndSelect('User.categories', 'Category')
-      .where('User.id = :id', { id: authUser.id })
-      .getOne();
-    if (!user) {
-      throw new CustomNotFound(['User not found']);
-    }
+    let user = this.usersRepository.create({
+      id: authUser.id,
+      ...updateMeDto,
+    });
     if (updateMeDto.categoryIds) {
       user.categories = await this.categoriesService.findAllById(
         updateMeDto.categoryIds,
       );
     }
-    return await this.usersRepository.save(user);
+    user = await this.usersRepository.save(user);
+    const newUser = await this.usersRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('User.categories', 'Category')
+      .where('User.id = :id', { id: user.id })
+      .getOne();
+    if (!newUser) {
+      throw new CustomInternalServerError();
+    }
+    return newUser;
   }
 
   async createOne(signUpDto: SignUpDto) {

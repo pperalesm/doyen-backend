@@ -1,18 +1,20 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { Active } from '../../shared/decorators/active.decorator';
 import { AuthUser } from '../../shared/decorators/auth-user.decorator';
 import { CustomBadRequest } from '../../shared/exceptions/custom-bad-request';
 import { Constants } from '../../shared/util/constants';
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
-import { CreateAuctionMeetingDto } from './dto/create-auction-meeting.dto';
 import { CreateMeetingDto } from './dto/create-meeting.dto';
+import { MyMeetingDto } from './dto/my-meeting.dto';
 import { MeetingsService } from './meetings.service';
 
 @Controller('meetings')
 export class MeetingsController {
   constructor(private readonly meetingsService: MeetingsService) {}
 
-  @Post('meeting')
-  async createMeeting(
+  @Active()
+  @Post()
+  async createOne(
     @AuthUser() authUser: AuthUserDto,
     @Body() createMeetingDto: CreateMeetingDto,
   ) {
@@ -44,18 +46,10 @@ export class MeetingsController {
     if (validationErrors.length > 0) {
       throw new CustomBadRequest(validationErrors);
     }
-    const meeting = await this.meetingsService.createMeeting(
+    const meeting = await this.meetingsService.createOne(
       authUser,
       createMeetingDto,
     );
-    return meeting;
-  }
-
-  @Post('auction-meeting')
-  async createAuctionMeeting(
-    @AuthUser() authUser: AuthUserDto,
-    @Body() createAuctionMeetingDto: CreateAuctionMeetingDto,
-  ) {
-    return;
+    return new MyMeetingDto(meeting);
   }
 }

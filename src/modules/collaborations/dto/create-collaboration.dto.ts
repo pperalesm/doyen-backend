@@ -1,6 +1,6 @@
 import { IsInt, IsString, IsUUID, Max, Min } from 'class-validator';
 
-export class CollaborationDto {
+export class CreateCollaborationDto {
   @IsUUID(4)
   @IsString()
   userId!: string;

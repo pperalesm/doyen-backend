@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Bid } from './bid.entity';
 import { Category } from './category.entity';
 import { Collaboration } from './collaboration.entity';
 import { Meeting } from './meeting.entity';
@@ -134,4 +135,7 @@ export class User {
 
   @OneToMany(() => Purchase, (purchase) => purchase.user)
   purchases!: Purchase[];
+
+  @OneToMany(() => Bid, (bids) => bids.user)
+  bids!: Bid[];
 }

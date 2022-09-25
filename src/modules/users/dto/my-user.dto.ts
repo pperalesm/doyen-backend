@@ -33,6 +33,6 @@ export class MyUserDto {
     this.avatarUrl = user.avatarUrl;
     this.about = user.about;
     this.profession = user.profession;
-    this.categories = user.categories;
+    this.categories = user.categories ? user.categories : [];
   }
 }

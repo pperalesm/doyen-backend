@@ -17,13 +17,13 @@ export class Bid {
   @Column({ type: 'float' })
   amount!: number;
 
-  @ManyToOne(() => User, (user) => user.purchases)
+  @ManyToOne(() => User, (user) => user.bids)
   user!: User;
 
   @Column()
   userId!: string;
 
-  @ManyToOne(() => Meeting, (meeting) => meeting.purchases)
+  @ManyToOne(() => Meeting, (meeting) => meeting.bids)
   meeting!: Meeting;
 
   @Column()

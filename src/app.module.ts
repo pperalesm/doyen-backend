@@ -18,6 +18,7 @@ import { CollaborationsModule } from './modules/collaborations/collaborations.mo
 import { PurchasesModule } from './modules/purchases/purchases.module';
 import { BidsModule } from './modules/bids/bids.module';
 import { StepsModule } from './modules/steps/steps.module';
+import { ActiveGuard } from './shared/guards/active.guard';
 
 @Module({
   imports: [
@@ -72,6 +73,10 @@ import { StepsModule } from './modules/steps/steps.module';
     {
       provide: APP_GUARD,
       useClass: JwtGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ActiveGuard,
     },
   ],
 })

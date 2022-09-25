@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { Collaboration } from '../../database/entities/collaboration.entity';
-import { CollaborationDto } from '../meetings/dto/collaboration.dto';
+import { CreateCollaborationDto } from './dto/create-collaboration.dto';
 
 @Injectable()
 export class CollaborationsService {
@@ -12,7 +12,7 @@ export class CollaborationsService {
   ) {}
 
   async createMany(
-    collaborationsInfo: CollaborationDto[],
+    collaborationsInfo: CreateCollaborationDto[],
     meetingId: string,
     entityManager: EntityManager,
   ) {
@@ -22,8 +22,6 @@ export class CollaborationsService {
         meetingId: meetingId,
       })),
     );
-    return await entityManager
-      .getRepository(Collaboration)
-      .save(collaborations);
+    await entityManager.getRepository(Collaboration).save(collaborations);
   }
 }

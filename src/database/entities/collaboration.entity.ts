@@ -17,8 +17,8 @@ export class Collaboration {
   @Column()
   percentage!: number;
 
-  @Column({ default: false })
-  isAccepted!: boolean;
+  @Column({ nullable: true })
+  isAccepted?: boolean;
 
   @ManyToOne(() => User, (user) => user.collaborations)
   user!: User;
