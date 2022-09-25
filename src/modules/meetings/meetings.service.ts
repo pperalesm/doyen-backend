@@ -60,7 +60,11 @@ export class MeetingsService {
     ) {
       query = query
         .leftJoinAndSelect('Meeting.collaborations', 'Collaboration')
-        .leftJoinAndSelect('Collaboration.user', 'CollaborationUser');
+        .leftJoinAndSelect('Collaboration.user', 'CollaborationUser')
+        .leftJoinAndSelect(
+          'CollaborationUser.categories',
+          'CollaborationUserCategory',
+        );
     }
     const newMeeting = await query
       .where('Meeting.id = :id', { id: meeting.id })
