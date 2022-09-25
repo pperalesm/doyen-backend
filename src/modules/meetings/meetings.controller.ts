@@ -19,7 +19,10 @@ export class MeetingsController {
     @Body() createMeetingDto: CreateMeetingDto,
   ) {
     const validationErrors: string[] = [];
-    if (createMeetingDto.collaborationsInfo) {
+    if (
+      createMeetingDto.collaborationsInfo &&
+      createMeetingDto.collaborationsInfo.length > 0
+    ) {
       if (
         createMeetingDto.collaborationsInfo.length +
           createMeetingDto.maxParticipants >
@@ -29,7 +32,7 @@ export class MeetingsController {
       }
       let percentageSum = 0;
       for (const collaboration of createMeetingDto.collaborationsInfo) {
-        if (collaboration.userId === authUser.id) {
+        if (collaboration.email === authUser.email) {
           validationErrors.push(Constants.COLLABORATION_INVALID_MESSAGE);
         }
         percentageSum += collaboration.percentage;
@@ -40,7 +43,13 @@ export class MeetingsController {
         );
       }
     }
-    if (createMeetingDto.scheduledAt.getTime() <= Date.now()) {
+    if (
+      createMeetingDto.isAuction &&
+      createMeetingDto.scheduledAt.getTime() - Constants.OPENED_AT_DAYS <=
+        Date.now()
+    ) {
+      validationErrors.push(Constants.SCHEDULED_AT_AUCTION_INVALID_MESSAGE);
+    } else if (createMeetingDto.scheduledAt.getTime() <= Date.now()) {
       validationErrors.push(Constants.SCHEDULED_AT_INVALID_MESSAGE);
     }
     if (validationErrors.length > 0) {

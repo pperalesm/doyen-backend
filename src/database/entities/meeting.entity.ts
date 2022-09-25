@@ -41,9 +41,6 @@ export class Meeting {
   createdAt!: Date;
 
   @Column({ nullable: true })
-  publishedAt?: Date;
-
-  @Column({ nullable: true })
   openedAt?: Date;
 
   @Column({ nullable: true })

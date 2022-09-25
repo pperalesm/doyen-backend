@@ -1,9 +1,8 @@
-import { IsInt, IsString, IsUUID, Max, Min } from 'class-validator';
+import { IsInt, IsString, Max, Min } from 'class-validator';
 
 export class CreateCollaborationDto {
-  @IsUUID(4)
   @IsString()
-  userId!: string;
+  email!: string;
 
   @Min(0)
   @Max(100)

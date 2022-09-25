@@ -1,7 +1,7 @@
 const { MigrationInterface, QueryRunner } = require('typeorm');
 
-module.exports = class AllEntitiesCreation1664104118292 {
-  name = 'AllEntitiesCreation1664104118292';
+module.exports = class AllEntitiesCreation1664135103136 {
+  name = 'AllEntitiesCreation1664135103136';
 
   async up(queryRunner) {
     await queryRunner.query(`
@@ -36,7 +36,6 @@ module.exports = class AllEntitiesCreation1664104118292 {
                 "duration" integer NOT NULL,
                 "next_in" integer,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-                "published_at" TIMESTAMP,
                 "opened_at" TIMESTAMP,
                 "phased_at" TIMESTAMP,
                 "closed_at" TIMESTAMP,

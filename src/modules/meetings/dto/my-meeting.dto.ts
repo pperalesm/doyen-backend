@@ -14,7 +14,6 @@ export class MyMeetingDto {
   duration!: number;
   nextIn?: number;
   createdAt!: Date;
-  publishedAt?: Date;
   openedAt?: Date;
   phasedAt?: Date;
   closedAt?: Date;
@@ -37,7 +36,6 @@ export class MyMeetingDto {
     this.duration = meeting.duration;
     this.nextIn = meeting.nextIn;
     this.createdAt = meeting.createdAt;
-    this.publishedAt = meeting.publishedAt;
     this.openedAt = meeting.openedAt;
     this.phasedAt = meeting.phasedAt;
     this.closedAt = meeting.closedAt;

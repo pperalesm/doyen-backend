@@ -1,4 +1,7 @@
 export const Constants = {
+  OPENED_AT_DAYS: 3,
+  PHASED_AT_DAYS: 2,
+  CLOSED_AT_DAYS: 1,
   CATEGORYIDS_MAX_SIZE: 5,
   PASSWORD_MIN_LENGTH: 8,
   USERNAME_MIN_LENGTH: 4,
@@ -22,6 +25,8 @@ export const Constants = {
   PARTICIPANTS_INVALID_MESSAGE:
     'The number of participants plus the number of collaborations must be lower than 499',
   SCHEDULED_AT_INVALID_MESSAGE: 'scheduledAt must be a future date',
+  SCHEDULED_AT_AUCTION_INVALID_MESSAGE:
+    'scheduledAt must be at least 3 days into the future',
   COLLABORATION_INVALID_MESSAGE:
     'You cannot be present within the collaborations',
   COLLABORATION_PERCENTAGE_INVALID_MESSAGE:
