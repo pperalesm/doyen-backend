@@ -45,15 +45,10 @@ export class MyMeetingDto {
     this.cancelledAt = meeting.cancelledAt;
     this.imageUrl = meeting.imageUrl;
     this.categories = meeting.categories ? meeting.categories : [];
-    this.attendeeUsers = meeting.attendeeUsers
-      ? meeting.attendeeUsers.map((user) => new OtherUserDto(user))
-      : [];
     this.collaborations = meeting.collaborations
       ? meeting.collaborations.map(
           (collaboration) => new MyMeetingCollaborationDto(collaboration),
         )
       : [];
-    this.purchases = meeting.purchases ? meeting.purchases : [];
-    this.bids = meeting.bids ? meeting.bids : [];
   }
 }

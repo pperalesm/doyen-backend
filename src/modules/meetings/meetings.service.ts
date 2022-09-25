@@ -1,17 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { NotificationsService } from '../notifications/notifications.service';
 import { CategoriesService } from '../categories/categories.service';
 import { Meeting } from '../../database/entities/meeting.entity';
-import { BidsService } from '../bids/bids.service';
-import { PurchasesService } from '../purchases/purchases.service';
 import { CreateMeetingDto } from './dto/create-meeting.dto';
 import { CollaborationsService } from '../collaborations/collaborations.service';
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
-import { Category } from '../../database/entities/category.entity';
-import { UsersService } from '../users/users.service';
-import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 import { CustomInternalServerError } from '../../shared/exceptions/custom-internal-server-error';
 
 @Injectable()
@@ -22,9 +16,6 @@ export class MeetingsService {
     private readonly collaborationsService: CollaborationsService,
     private readonly categoriesService: CategoriesService,
     private readonly dataSource: DataSource,
-    private readonly notificationsService: NotificationsService,
-    private readonly bidsService: BidsService,
-    private readonly purchasesService: PurchasesService,
   ) {}
 
   async createOne(authUser: AuthUserDto, createMeetingDto: CreateMeetingDto) {
