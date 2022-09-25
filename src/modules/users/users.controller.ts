@@ -41,7 +41,7 @@ export class UsersController {
     return new OtherUserDto(user);
   }
 
-  @Patch('update-me')
+  @Patch()
   async updateMe(
     @AuthUser() authUser: AuthUserDto,
     @Body() updateMeDto: UpdateMeDto,

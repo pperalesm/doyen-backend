@@ -8,6 +8,7 @@ import { CollaborationsService } from '../collaborations/collaborations.service'
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
 import { CustomInternalServerError } from '../../shared/exceptions/custom-internal-server-error';
 import { Constants } from '../../shared/util/constants';
+import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 
 @Injectable()
 export class MeetingsService {
@@ -57,31 +58,45 @@ export class MeetingsService {
         );
       }
     });
-    let query = this.meetingsRepository.createQueryBuilder();
-    if (
-      createMeetingDto.categoryIds &&
-      createMeetingDto.categoryIds.length > 0
-    ) {
-      query = query.leftJoinAndSelect('Meeting.categories', 'Category');
-    }
-    if (
-      createMeetingDto.collaborationsInfo &&
-      createMeetingDto.collaborationsInfo.length > 0
-    ) {
-      query = query
-        .leftJoinAndSelect('Meeting.collaborations', 'Collaboration')
-        .leftJoinAndSelect('Collaboration.user', 'CollaborationUser')
-        .leftJoinAndSelect(
-          'CollaborationUser.categories',
-          'CollaborationUserCategory',
-        );
-    }
-    const newMeeting = await query
+    const newMeeting = await this.meetingsRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('Meeting.categories', 'Category')
+      .leftJoinAndSelect('Meeting.collaborations', 'Collaboration')
+      .leftJoinAndSelect('Collaboration.user', 'CollaborationUser')
+      .leftJoinAndSelect(
+        'CollaborationUser.categories',
+        'CollaborationUserCategory',
+      )
       .where('Meeting.id = :id', { id: meeting.id })
       .getOne();
     if (!newMeeting) {
       throw new CustomInternalServerError();
     }
     return newMeeting;
+  }
+
+  async cancel(authUser: AuthUserDto, id: string) {
+    await this.meetingsRepository
+      .createQueryBuilder()
+      .update()
+      .set({ cancelledAt: new Date() })
+      .where({ id: id, creatorUserId: authUser.id })
+      .execute();
+    const updatedMeeting = await this.meetingsRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('Meeting.categories', 'Category')
+      .leftJoinAndSelect('Meeting.collaborations', 'Collaboration')
+      .leftJoinAndSelect('Collaboration.user', 'CollaborationUser')
+      .leftJoinAndSelect(
+        'CollaborationUser.categories',
+        'CollaborationUserCategory',
+      )
+      .where('Meeting.id = :meetingId', { meetingId: id })
+      .andWhere('Meeting.creatorUserId = :userId', { userId: authUser.id })
+      .getOne();
+    if (!updatedMeeting) {
+      throw new CustomNotFound(['Meeting not found']);
+    }
+    return updatedMeeting;
   }
 }

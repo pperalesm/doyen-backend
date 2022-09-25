@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { Active } from '../../shared/decorators/active.decorator';
 import { AuthUser } from '../../shared/decorators/auth-user.decorator';
 import { CustomBadRequest } from '../../shared/exceptions/custom-bad-request';
@@ -14,7 +14,7 @@ export class MeetingsController {
 
   @Active()
   @Post()
-  async createOne(
+  async create(
     @AuthUser() authUser: AuthUserDto,
     @Body() createMeetingDto: CreateMeetingDto,
   ) {
@@ -59,6 +59,12 @@ export class MeetingsController {
       authUser,
       createMeetingDto,
     );
+    return new MyMeetingDto(meeting);
+  }
+
+  @Patch(':id/cancel')
+  async cancel(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
+    const meeting = await this.meetingsService.cancel(authUser, id);
     return new MyMeetingDto(meeting);
   }
 }

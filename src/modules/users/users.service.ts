@@ -139,14 +139,6 @@ export class UsersService {
       .getOne();
   }
 
-  async findOneByIdWithCategories(id: string) {
-    return await this.usersRepository
-      .createQueryBuilder()
-      .leftJoinAndSelect('User.categories', 'Category')
-      .where('User.id = :id', { id: id })
-      .getOne();
-  }
-
   async findOneByEmail(email: string) {
     return await this.usersRepository
       .createQueryBuilder()
