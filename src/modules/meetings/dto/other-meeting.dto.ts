@@ -3,17 +3,16 @@ import { Category } from '../../../database/entities/category.entity';
 import { Meeting } from '../../../database/entities/meeting.entity';
 import { Purchase } from '../../../database/entities/purchase.entity';
 import { MyMeetingCollaborationDto } from '../../collaborations/dto/my-meeting-collaboration.dto';
+import { OtherMeetingCollaborationDto } from '../../collaborations/dto/other-meeting-collaboration.dto';
 import { OtherUserDto } from '../../users/dto/other-user.dto';
 
-export class MyMeetingDto {
+export class OtherMeetingDto {
   id!: string;
   title!: string;
   isAuction!: boolean;
   basePrice!: number;
   maxParticipants!: number;
   duration!: number;
-  nextIn?: number;
-  createdAt!: Date;
   openedAt?: Date;
   phasedAt?: Date;
   closedAt?: Date;
@@ -22,7 +21,7 @@ export class MyMeetingDto {
   imageUrl?: string;
   description?: string;
   categories!: Category[];
-  collaborations!: MyMeetingCollaborationDto[];
+  collaborations!: OtherMeetingCollaborationDto[];
 
   constructor(meeting: Meeting) {
     this.id = meeting.id;
@@ -31,8 +30,6 @@ export class MyMeetingDto {
     this.basePrice = meeting.basePrice;
     this.maxParticipants = meeting.maxParticipants;
     this.duration = meeting.duration;
-    this.nextIn = meeting.nextIn;
-    this.createdAt = meeting.createdAt;
     this.openedAt = meeting.openedAt;
     this.phasedAt = meeting.phasedAt;
     this.closedAt = meeting.closedAt;
@@ -42,7 +39,7 @@ export class MyMeetingDto {
     this.categories = meeting.categories ? meeting.categories : [];
     this.collaborations = meeting.collaborations
       ? meeting.collaborations.map(
-          (collaboration) => new MyMeetingCollaborationDto(collaboration),
+          (collaboration) => new OtherMeetingCollaborationDto(collaboration),
         )
       : [];
   }

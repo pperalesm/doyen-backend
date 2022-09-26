@@ -10,6 +10,7 @@ import { UpdateMeDto } from './dto/update-me.dto';
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
 import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 import { CustomInternalServerError } from '../../shared/exceptions/custom-internal-server-error';
+import { PagingDto } from '../../shared/util/paging.dto';
 
 @Injectable()
 export class UsersService {
@@ -82,19 +83,25 @@ export class UsersService {
     return user;
   }
 
-  async followers(authUser: AuthUserDto) {
+  async followers(authUser: AuthUserDto, pagingDto: PagingDto) {
     return await this.usersRepository
       .createQueryBuilder()
       .leftJoin('User.followedUsers', 'Followed')
       .where('Followed.id = :id', { id: authUser.id })
+      .orderBy('User.username', 'ASC')
+      .take(pagingDto?.take || 10)
+      .skip(pagingDto?.skip)
       .getMany();
   }
 
-  async followed(authUser: AuthUserDto) {
+  async followed(authUser: AuthUserDto, pagingDto: PagingDto) {
     return await this.usersRepository
       .createQueryBuilder()
       .leftJoin('User.followerUsers', 'Follower')
       .where('Follower.id = :id', { id: authUser.id })
+      .orderBy('User.username', 'ASC')
+      .take(pagingDto?.take || 10)
+      .skip(pagingDto?.skip)
       .getMany();
   }
 

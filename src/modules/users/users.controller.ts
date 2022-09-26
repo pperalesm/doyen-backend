@@ -6,6 +6,7 @@ import { AuthUser } from '../../shared/decorators/auth-user.decorator';
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
 import { UpdateMeDto } from './dto/update-me.dto';
 import { MyUserDto } from './dto/my-user.dto';
+import { PagingDto } from '../../shared/util/paging.dto';
 
 @Controller('users')
 export class UsersController {
@@ -24,14 +25,20 @@ export class UsersController {
   }
 
   @Get('followers')
-  async followers(@AuthUser() authUser: AuthUserDto) {
-    const users = await this.usersService.followers(authUser);
+  async followers(
+    @AuthUser() authUser: AuthUserDto,
+    @Query() pagingDto: PagingDto,
+  ) {
+    const users = await this.usersService.followers(authUser, pagingDto);
     return users.map((user) => new OtherUserDto(user));
   }
 
   @Get('followed')
-  async followed(@AuthUser() authUser: AuthUserDto) {
-    const users = await this.usersService.followed(authUser);
+  async followed(
+    @AuthUser() authUser: AuthUserDto,
+    @Query() pagingDto: PagingDto,
+  ) {
+    const users = await this.usersService.followed(authUser, pagingDto);
     return users.map((user) => new OtherUserDto(user));
   }
 

@@ -1,25 +1,7 @@
-import {
-  IsArray,
-  IsInt,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsArray, IsOptional, IsString, IsUUID } from 'class-validator';
+import { PagingDto } from '../../../shared/util/paging.dto';
 
-export class FindAllUsersDto {
-  @Min(1)
-  @Max(50)
-  @IsInt()
-  @IsOptional()
-  take?: number;
-
-  @Min(0)
-  @IsInt()
-  @IsOptional()
-  skip?: number;
-
+export class FindAllUsersDto extends PagingDto {
   @IsUUID(4, { each: true })
   @IsString({ each: true })
   @IsArray()
