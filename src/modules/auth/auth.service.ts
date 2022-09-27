@@ -35,8 +35,7 @@ export class AuthService {
       signInDto.usernameOrEmail,
     );
     if (
-      !user ||
-      !user.password ||
+      !user?.password ||
       !(await bcrypt.compare(signInDto.password, user.password)) ||
       (user.bannedUntil && user.bannedUntil.getTime() > Date.now())
     ) {
@@ -51,8 +50,7 @@ export class AuthService {
     });
     const user = await this.usersService.findOneById(id);
     if (
-      !user ||
-      !user.refreshToken ||
+      !user?.refreshToken ||
       !(await bcrypt.compare(refreshDto.refreshToken, user.refreshToken)) ||
       (user.bannedUntil && user.bannedUntil.getTime() > Date.now())
     ) {

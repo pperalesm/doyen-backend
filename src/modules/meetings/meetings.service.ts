@@ -37,20 +37,14 @@ export class MeetingsService {
         meeting.scheduledAt.getTime() - msInDay * Constants.CLOSED_AT_DAYS,
       );
     }
-    if (
-      createMeetingDto.categoryIds &&
-      createMeetingDto.categoryIds.length > 0
-    ) {
+    if (createMeetingDto.categoryIds?.length) {
       meeting.categories = await this.categoriesService.findAllById(
         createMeetingDto.categoryIds,
       );
     }
     await this.dataSource.transaction(async (entityManager) => {
       meeting = await entityManager.getRepository(Meeting).save(meeting);
-      if (
-        createMeetingDto.collaborationsInfo &&
-        createMeetingDto.collaborationsInfo.length > 0
-      ) {
+      if (createMeetingDto.collaborationsInfo?.length) {
         await this.collaborationsService.createMany(
           createMeetingDto.collaborationsInfo,
           meeting.id,

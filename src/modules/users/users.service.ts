@@ -26,7 +26,7 @@ export class UsersService {
       .leftJoinAndSelect('User.categories', 'Category')
       .where('User.id = :id', { id: id })
       .getOne();
-    if (!user || !user.isPublic) {
+    if (!user?.isPublic) {
       throw new CustomNotFound(['User not found']);
     }
     return user;
@@ -37,7 +37,7 @@ export class UsersService {
       .createQueryBuilder()
       .leftJoinAndSelect('User.categories', 'Category')
       .where('User.isPublic = true');
-    if (findAllUsersDto.categoryIds && findAllUsersDto.categoryIds.length > 0) {
+    if (findAllUsersDto.categoryIds?.length) {
       query = query
         .leftJoin('User.categories', 'AuxCategory')
         .andWhere('AuxCategory.id IN (:...categoryIds)', {

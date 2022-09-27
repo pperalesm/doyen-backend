@@ -19,10 +19,7 @@ export class MeetingsController {
     @Body() createMeetingDto: CreateMeetingDto,
   ) {
     const validationErrors: string[] = [];
-    if (
-      createMeetingDto.collaborationsInfo &&
-      createMeetingDto.collaborationsInfo.length > 0
-    ) {
+    if (createMeetingDto.collaborationsInfo?.length) {
       if (
         createMeetingDto.collaborationsInfo.length +
           createMeetingDto.maxParticipants >
