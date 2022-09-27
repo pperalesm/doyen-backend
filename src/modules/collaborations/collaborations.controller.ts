@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import { AuthUser } from '../../shared/decorators/auth-user.decorator';
 import { PagingDto } from '../../shared/util/paging.dto';
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
@@ -21,5 +21,20 @@ export class CollaborationsController {
     return collaborations.map(
       (collaboration) => new MyCollaborationDto(collaboration),
     );
+  }
+
+  @Patch(':id/accept')
+  async accept(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
+    const collaboration = await this.collaborationsService.accept(authUser, id);
+    return new MyCollaborationDto(collaboration);
+  }
+
+  @Patch(':id/decline')
+  async decline(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
+    const collaboration = await this.collaborationsService.decline(
+      authUser,
+      id,
+    );
+    return new MyCollaborationDto(collaboration);
   }
 }
