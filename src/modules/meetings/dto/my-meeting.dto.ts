@@ -1,9 +1,6 @@
-import { Bid } from '../../../database/entities/bid.entity';
 import { Category } from '../../../database/entities/category.entity';
 import { Meeting } from '../../../database/entities/meeting.entity';
-import { Purchase } from '../../../database/entities/purchase.entity';
 import { MyMeetingCollaborationDto } from '../../collaborations/dto/my-meeting-collaboration.dto';
-import { OtherUserDto } from '../../users/dto/other-user.dto';
 
 export class MyMeetingDto {
   id!: string;

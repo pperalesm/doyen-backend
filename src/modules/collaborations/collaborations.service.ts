@@ -43,11 +43,16 @@ export class CollaborationsService {
     await entityManager.getRepository(Collaboration).save(collaborations);
   }
 
-  async findAll(authUser: AuthUserDto, pagingDto: PagingDto) {
+  async mine(authUser: AuthUserDto, pagingDto: PagingDto) {
     return await this.collaborationsRepository
       .createQueryBuilder()
       .leftJoinAndSelect('Collaboration.meeting', 'Meeting')
       .leftJoinAndSelect('Meeting.categories', 'MeetingCategory')
+      .leftJoinAndSelect('Meeting.creatorUser', 'MeetingCreatorUser')
+      .leftJoinAndSelect(
+        'MeetingCreatorUser.categories',
+        'MeetingCreatorUserCategory',
+      )
       .leftJoinAndSelect('Meeting.collaborations', 'MeetingCollaboration')
       .leftJoinAndSelect(
         'MeetingCollaboration.user',
@@ -78,6 +83,11 @@ export class CollaborationsService {
       .createQueryBuilder()
       .leftJoinAndSelect('Collaboration.meeting', 'Meeting')
       .leftJoinAndSelect('Meeting.categories', 'MeetingCategory')
+      .leftJoinAndSelect('Meeting.creatorUser', 'MeetingCreatorUser')
+      .leftJoinAndSelect(
+        'MeetingCreatorUser.categories',
+        'MeetingCreatorUserCategory',
+      )
       .leftJoinAndSelect('Meeting.collaborations', 'MeetingCollaboration')
       .leftJoinAndSelect(
         'MeetingCollaboration.user',
@@ -108,6 +118,11 @@ export class CollaborationsService {
       .createQueryBuilder()
       .leftJoinAndSelect('Collaboration.meeting', 'Meeting')
       .leftJoinAndSelect('Meeting.categories', 'MeetingCategory')
+      .leftJoinAndSelect('Meeting.creatorUser', 'MeetingCreatorUser')
+      .leftJoinAndSelect(
+        'MeetingCreatorUser.categories',
+        'MeetingCreatorUserCategory',
+      )
       .leftJoinAndSelect('Meeting.collaborations', 'MeetingCollaboration')
       .leftJoinAndSelect(
         'MeetingCollaboration.user',

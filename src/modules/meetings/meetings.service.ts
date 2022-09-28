@@ -9,6 +9,7 @@ import { AuthUserDto } from '../auth/dto/auth-user.dto';
 import { CustomInternalServerError } from '../../shared/exceptions/custom-internal-server-error';
 import { Constants } from '../../shared/util/constants';
 import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
+import { FindAllMeetingsDto } from './dto/find-all-meetings.dto';
 
 @Injectable()
 export class MeetingsService {
@@ -92,5 +93,55 @@ export class MeetingsService {
       throw new CustomNotFound(['Meeting not found']);
     }
     return updatedMeeting;
+  }
+
+  async findAll(findAllMeetingsDto: FindAllMeetingsDto) {
+    let query = this.meetingsRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('Meeting.categories', 'Category')
+      .leftJoinAndSelect('Meeting.creatorUser', 'CreatorUser')
+      .leftJoinAndSelect('CreatorUser.categories', 'CreatorUserCategory')
+      .leftJoinAndSelect('Meeting.collaborations', 'Collaboration')
+      .leftJoinAndSelect('Collaboration.user', 'CollaborationUser')
+      .leftJoinAndSelect(
+        'CollaborationUser.categories',
+        'CollaborationUserCategory',
+      )
+      .where('Meeting.cancelledAt IS NULL')
+      .andWhere(
+        '(Meeting.isAuction = true AND Meeting.closedAt > :now OR Meeting.isAuction = false AND Meeting.scheduledAt > :now)',
+        { now: new Date() },
+      );
+    if (findAllMeetingsDto.isAuction !== undefined) {
+      query = query.andWhere('Meeting.isAuction = :isAuction', {
+        isAuction: findAllMeetingsDto.isAuction,
+      });
+    }
+    if (findAllMeetingsDto.userId) {
+      query = query.andWhere(
+        '(CreatorUser.id = :userId OR CollaborationUser.id = :userId)',
+        {
+          userId: findAllMeetingsDto.userId,
+        },
+      );
+    }
+    if (findAllMeetingsDto.categoryIds?.length) {
+      query = query
+        .leftJoin('Meeting.categories', 'AuxCategory')
+        .andWhere('AuxCategory.id IN (:...categoryIds)', {
+          categoryIds: findAllMeetingsDto.categoryIds,
+        })
+        .groupBy(
+          'Meeting.id, Collaboration.id, CollaborationUser.id, CollaborationUserCategory.id, CreatorUser.id, CreatorUserCategory.id, Category.id',
+        )
+        .having('Count(*) = :numCategories', {
+          numCategories: findAllMeetingsDto.categoryIds?.length,
+        });
+    }
+    return await query
+      .orderBy('Meeting.scheduledAt', 'ASC')
+      .take(findAllMeetingsDto?.take || 10)
+      .skip(findAllMeetingsDto?.skip)
+      .getMany();
   }
 }

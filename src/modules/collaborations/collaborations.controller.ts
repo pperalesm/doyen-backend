@@ -9,12 +9,9 @@ import { MyCollaborationDto } from './dto/my-collaboration.dto';
 export class CollaborationsController {
   constructor(private readonly collaborationsService: CollaborationsService) {}
 
-  @Get()
-  async findAll(
-    @AuthUser() authUser: AuthUserDto,
-    @Query() pagingDto: PagingDto,
-  ) {
-    const collaborations = await this.collaborationsService.findAll(
+  @Get('mine')
+  async mine(@AuthUser() authUser: AuthUserDto, @Query() pagingDto: PagingDto) {
+    const collaborations = await this.collaborationsService.mine(
       authUser,
       pagingDto,
     );

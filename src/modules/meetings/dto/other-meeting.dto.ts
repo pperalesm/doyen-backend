@@ -1,8 +1,5 @@
-import { Bid } from '../../../database/entities/bid.entity';
 import { Category } from '../../../database/entities/category.entity';
 import { Meeting } from '../../../database/entities/meeting.entity';
-import { Purchase } from '../../../database/entities/purchase.entity';
-import { MyMeetingCollaborationDto } from '../../collaborations/dto/my-meeting-collaboration.dto';
 import { OtherMeetingCollaborationDto } from '../../collaborations/dto/other-meeting-collaboration.dto';
 import { OtherUserDto } from '../../users/dto/other-user.dto';
 
@@ -22,6 +19,7 @@ export class OtherMeetingDto {
   description?: string;
   categories!: Category[];
   collaborations!: OtherMeetingCollaborationDto[];
+  creatorUser!: OtherUserDto;
 
   constructor(meeting: Meeting) {
     this.id = meeting.id;
@@ -42,5 +40,6 @@ export class OtherMeetingDto {
           (collaboration) => new OtherMeetingCollaborationDto(collaboration),
         )
       : [];
+    this.creatorUser = new OtherUserDto(meeting.creatorUser);
   }
 }

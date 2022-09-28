@@ -7,4 +7,8 @@ export class FindAllUsersDto extends PagingDto {
   @IsArray()
   @IsOptional()
   categoryIds?: string[];
+
+  @IsString()
+  @IsOptional()
+  username?: string;
 }

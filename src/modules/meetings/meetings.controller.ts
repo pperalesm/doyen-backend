@@ -1,16 +1,32 @@
-import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { Active } from '../../shared/decorators/active.decorator';
 import { AuthUser } from '../../shared/decorators/auth-user.decorator';
 import { CustomBadRequest } from '../../shared/exceptions/custom-bad-request';
 import { Constants } from '../../shared/util/constants';
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
 import { CreateMeetingDto } from './dto/create-meeting.dto';
+import { FindAllMeetingsDto } from './dto/find-all-meetings.dto';
 import { MyMeetingDto } from './dto/my-meeting.dto';
+import { OtherMeetingDto } from './dto/other-meeting.dto';
 import { MeetingsService } from './meetings.service';
 
 @Controller('meetings')
 export class MeetingsController {
   constructor(private readonly meetingsService: MeetingsService) {}
+
+  @Get()
+  async findAll(@Query() findAllMeetingsDto: FindAllMeetingsDto) {
+    const meetings = await this.meetingsService.findAll(findAllMeetingsDto);
+    return meetings.map((meeting) => new OtherMeetingDto(meeting));
+  }
 
   @Active()
   @Post()
