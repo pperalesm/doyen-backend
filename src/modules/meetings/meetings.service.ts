@@ -8,11 +8,9 @@ import { CollaborationsService } from '../collaborations/collaborations.service'
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
 import { CustomInternalServerError } from '../../shared/exceptions/custom-internal-server-error';
 import { Constants } from '../../shared/util/constants';
-import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 import { FindAllMeetingsDto } from './dto/find-all-meetings.dto';
 import { PagingDto } from '../../shared/util/paging.dto';
 import { UpdateMeetingDto } from './dto/update-meeting.dto';
-import { CustomForbidden } from '../../shared/exceptions/custom-forbidden';
 
 @Injectable()
 export class MeetingsService {
@@ -220,18 +218,12 @@ export class MeetingsService {
     return updatedMeeting;
   }
 
-  async assertOwnership(userId: string, meetingId: string) {
-    const exists = await this.meetingsRepository
+  async findOneById(id: string) {
+    return await this.meetingsRepository
       .createQueryBuilder()
-      .where('Meeting.id = :meetingId', {
-        meetingId: meetingId,
+      .where('Meeting.id = :id', {
+        id: id,
       })
-      .andWhere('Meeting.creatorUserId = :creatorUserId', {
-        creatorUserId: userId,
-      })
-      .getCount();
-    if (!exists) {
-      throw new CustomForbidden(['Access to resource not authorized']);
-    }
+      .getOne();
   }
 }

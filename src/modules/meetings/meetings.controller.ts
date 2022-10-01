@@ -10,6 +10,8 @@ import {
 import { Active } from '../../shared/decorators/active.decorator';
 import { AuthUser } from '../../shared/decorators/auth-user.decorator';
 import { CustomBadRequest } from '../../shared/exceptions/custom-bad-request';
+import { CustomForbidden } from '../../shared/exceptions/custom-forbidden';
+import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 import { Constants } from '../../shared/util/constants';
 import { PagingDto } from '../../shared/util/paging.dto';
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
@@ -88,8 +90,14 @@ export class MeetingsController {
 
   @Patch(':id/cancel')
   async cancel(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
-    await this.meetingsService.assertOwnership(authUser.id, id);
-    const meeting = await this.meetingsService.cancel(id);
+    let meeting = await this.meetingsService.findOneById(id);
+    if (!meeting) {
+      throw new CustomNotFound(['Meeting not found']);
+    }
+    if (meeting.creatorUserId !== authUser.id) {
+      throw new CustomForbidden(['Access to resource not authorized']);
+    }
+    meeting = await this.meetingsService.cancel(id);
     return new MyMeetingDto(meeting);
   }
 
@@ -109,8 +117,14 @@ export class MeetingsController {
     @Param('id') id: string,
     @Body() updateMeetingDto: UpdateMeetingDto,
   ) {
-    await this.meetingsService.assertOwnership(authUser.id, id);
-    const meeting = await this.meetingsService.updateOne(id, updateMeetingDto);
+    let meeting = await this.meetingsService.findOneById(id);
+    if (!meeting) {
+      throw new CustomNotFound(['Meeting not found']);
+    }
+    if (meeting.creatorUserId !== authUser.id) {
+      throw new CustomForbidden(['Access to resource not authorized']);
+    }
+    meeting = await this.meetingsService.updateOne(id, updateMeetingDto);
     return new MyMeetingDto(meeting);
   }
 }

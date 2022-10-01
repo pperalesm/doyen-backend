@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { Collaboration } from '../../database/entities/collaboration.entity';
-import { CustomForbidden } from '../../shared/exceptions/custom-forbidden';
 import { CustomInternalServerError } from '../../shared/exceptions/custom-internal-server-error';
 import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 import { PagingDto } from '../../shared/util/paging.dto';
@@ -142,18 +141,12 @@ export class CollaborationsService {
     return collaboration;
   }
 
-  async assertOwnership(userId: string, collaborationId: string) {
-    const exists = await this.collaborationsRepository
+  async findOneById(id: string) {
+    return await this.collaborationsRepository
       .createQueryBuilder()
-      .where('Collaboration.id = :collaborationId', {
-        collaborationId: collaborationId,
+      .where('Collaboration.id = :id', {
+        id: id,
       })
-      .andWhere('Collaboration.userId = :userId', {
-        userId: userId,
-      })
-      .getCount();
-    if (!exists) {
-      throw new CustomForbidden(['Access to resource not authorized']);
-    }
+      .getOne();
   }
 }
