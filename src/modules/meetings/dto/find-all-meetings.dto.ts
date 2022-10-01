@@ -1,6 +1,9 @@
 import {
   IsArray,
   IsBoolean,
+  IsDate,
+  IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -22,4 +25,36 @@ export class FindAllMeetingsDto extends PagingDto {
   @IsBoolean()
   @IsOptional()
   isAuction?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  minBasePrice?: number;
+
+  @IsNumber()
+  @IsOptional()
+  maxBasePrice?: number;
+
+  @IsInt()
+  @IsOptional()
+  minMaxParticipants?: number;
+
+  @IsInt()
+  @IsOptional()
+  maxMaxParticipants?: number;
+
+  @IsInt()
+  @IsOptional()
+  minDuration?: number;
+
+  @IsInt()
+  @IsOptional()
+  maxDuration?: number;
+
+  @IsDate()
+  @IsOptional()
+  minScheduledAt?: Date;
+
+  @IsDate()
+  @IsOptional()
+  maxScheduledAt?: Date;
 }

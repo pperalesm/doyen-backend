@@ -154,6 +154,19 @@ export class MeetingsService {
         '(Meeting.isAuction = true AND Meeting.closedAt > :now OR Meeting.isAuction = false AND Meeting.scheduledAt > :now)',
         { now: new Date() },
       );
+    if (findAllMeetingsDto.categoryIds?.length) {
+      query = query
+        .leftJoin('Meeting.categories', 'AuxCategory')
+        .andWhere('AuxCategory.id IN (:...categoryIds)', {
+          categoryIds: findAllMeetingsDto.categoryIds,
+        })
+        .groupBy(
+          'Meeting.id, Collaboration.id, CollaborationUser.id, CollaborationUserCategory.id, CreatorUser.id, CreatorUserCategory.id, Category.id',
+        )
+        .having('Count(*) = :numCategories', {
+          numCategories: findAllMeetingsDto.categoryIds?.length,
+        });
+    }
     if (findAllMeetingsDto.isAuction !== undefined) {
       query = query.andWhere('Meeting.isAuction = :isAuction', {
         isAuction: findAllMeetingsDto.isAuction,
@@ -167,18 +180,45 @@ export class MeetingsService {
         },
       );
     }
-    if (findAllMeetingsDto.categoryIds?.length) {
-      query = query
-        .leftJoin('Meeting.categories', 'AuxCategory')
-        .andWhere('AuxCategory.id IN (:...categoryIds)', {
-          categoryIds: findAllMeetingsDto.categoryIds,
-        })
-        .groupBy(
-          'Meeting.id, Collaboration.id, CollaborationUser.id, CollaborationUserCategory.id, CreatorUser.id, CreatorUserCategory.id, Category.id',
-        )
-        .having('Count(*) = :numCategories', {
-          numCategories: findAllMeetingsDto.categoryIds?.length,
-        });
+    if (findAllMeetingsDto.minBasePrice) {
+      query = query.andWhere('Meeting.basePrice >= :minBasePrice', {
+        minBasePrice: findAllMeetingsDto.minBasePrice,
+      });
+    }
+    if (findAllMeetingsDto.maxBasePrice) {
+      query = query.andWhere('Meeting.basePrice <= :maxBasePrice', {
+        maxBasePrice: findAllMeetingsDto.maxBasePrice,
+      });
+    }
+    if (findAllMeetingsDto.minMaxParticipants) {
+      query = query.andWhere('Meeting.maxParticipants >= :minMaxParticipants', {
+        minMaxParticipants: findAllMeetingsDto.minMaxParticipants,
+      });
+    }
+    if (findAllMeetingsDto.maxMaxParticipants) {
+      query = query.andWhere('Meeting.maxParticipants <= :maxMaxParticipants', {
+        maxMaxParticipants: findAllMeetingsDto.maxMaxParticipants,
+      });
+    }
+    if (findAllMeetingsDto.minDuration) {
+      query = query.andWhere('Meeting.duration >= :minDuration', {
+        minDuration: findAllMeetingsDto.minDuration,
+      });
+    }
+    if (findAllMeetingsDto.maxDuration) {
+      query = query.andWhere('Meeting.duration <= :maxDuration', {
+        maxDuration: findAllMeetingsDto.maxDuration,
+      });
+    }
+    if (findAllMeetingsDto.minScheduledAt) {
+      query = query.andWhere('Meeting.scheduledAt >= :minScheduledAt', {
+        minScheduledAt: findAllMeetingsDto.minScheduledAt,
+      });
+    }
+    if (findAllMeetingsDto.maxScheduledAt) {
+      query = query.andWhere('Meeting.scheduledAt <= :maxScheduledAt', {
+        maxScheduledAt: findAllMeetingsDto.maxScheduledAt,
+      });
     }
     return await query
       .orderBy('Meeting.scheduledAt', 'ASC')
