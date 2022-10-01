@@ -187,6 +187,25 @@ export class MeetingsService {
       .getMany();
   }
 
+  async mine(authUser: AuthUserDto, pagingDto: PagingDto) {
+    return await this.meetingsRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('Meeting.categories', 'Category')
+      .leftJoinAndSelect('Meeting.collaborations', 'Collaboration')
+      .leftJoinAndSelect('Collaboration.user', 'CollaborationUser')
+      .leftJoinAndSelect(
+        'CollaborationUser.categories',
+        'CollaborationUserCategory',
+      )
+      .where('Meeting.creatorUserId = :id', { id: authUser.id })
+      .andWhere('Meeting.cancelledAt IS NULL')
+      .andWhere('Meeting.scheduledAt > :now', { now: new Date() })
+      .orderBy('Meeting.scheduledAt', 'ASC')
+      .take(pagingDto?.take || 10)
+      .skip(pagingDto?.skip)
+      .getMany();
+  }
+
   async updateOne(id: string, updateMeetingDto: UpdateMeetingDto) {
     let meeting = this.meetingsRepository.create({
       id: id,

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { Collaboration } from '../../database/entities/collaboration.entity';
+import { CustomBadRequest } from '../../shared/exceptions/custom-bad-request';
 import { CustomInternalServerError } from '../../shared/exceptions/custom-internal-server-error';
 import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 import { PagingDto } from '../../shared/util/paging.dto';
@@ -31,6 +32,11 @@ export class CollaborationsService {
           if (!user) {
             throw new CustomNotFound([
               `User with email ${collaborationInfo.email} not found`,
+            ]);
+          }
+          if (!user.isActive) {
+            throw new CustomBadRequest([
+              `User with email ${collaborationInfo.email} is not yet activated`,
             ]);
           }
           return {
@@ -63,8 +69,7 @@ export class CollaborationsService {
         'MeetingCollaborationUser.categories',
         'MeetingCollaborationUserCategory',
       )
-      .leftJoin('Collaboration.user', 'User')
-      .where('User.id = :id', { id: authUser.id })
+      .where('Collaboration.userId = :id', { id: authUser.id })
       .andWhere('Meeting.cancelledAt IS NULL')
       .andWhere('Meeting.scheduledAt > :now', { now: new Date() })
       .orderBy('Meeting.createdAt', 'DESC')
@@ -98,7 +103,6 @@ export class CollaborationsService {
         'MeetingCollaborationUser.categories',
         'MeetingCollaborationUserCategory',
       )
-      .leftJoin('Collaboration.user', 'User')
       .where('Collaboration.id = :collaborationId', { collaborationId: id })
       .getOne();
     if (!collaboration) {
@@ -132,7 +136,6 @@ export class CollaborationsService {
         'MeetingCollaborationUser.categories',
         'MeetingCollaborationUserCategory',
       )
-      .leftJoin('Collaboration.user', 'User')
       .where('Collaboration.id = :collaborationId', { collaborationId: id })
       .getOne();
     if (!collaboration) {

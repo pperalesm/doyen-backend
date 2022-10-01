@@ -41,6 +41,12 @@ export class MeetingsController {
     return meetings.map((meeting) => new OtherMeetingDto(meeting));
   }
 
+  @Get('mine')
+  async mine(@AuthUser() authUser: AuthUserDto, @Query() pagingDto: PagingDto) {
+    const meetings = await this.meetingsService.mine(authUser, pagingDto);
+    return meetings.map((meeting) => new MyMeetingDto(meeting));
+  }
+
   @Active()
   @Post()
   async create(
