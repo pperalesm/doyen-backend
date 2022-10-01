@@ -11,6 +11,8 @@ import { Constants } from '../../shared/util/constants';
 import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 import { FindAllMeetingsDto } from './dto/find-all-meetings.dto';
 import { PagingDto } from '../../shared/util/paging.dto';
+import { UpdateMeetingDto } from './dto/update-meeting.dto';
+import { CustomForbidden } from '../../shared/exceptions/custom-forbidden';
 
 @Injectable()
 export class MeetingsService {
@@ -113,12 +115,12 @@ export class MeetingsService {
       .remove(authUser.id);
   }
 
-  async cancel(authUser: AuthUserDto, id: string) {
+  async cancel(id: string) {
     await this.meetingsRepository
       .createQueryBuilder()
       .update()
       .set({ cancelledAt: new Date() })
-      .where({ id: id, creatorUserId: authUser.id })
+      .where({ id: id })
       .execute();
     const updatedMeeting = await this.meetingsRepository
       .createQueryBuilder()
@@ -130,10 +132,9 @@ export class MeetingsService {
         'CollaborationUserCategory',
       )
       .where('Meeting.id = :meetingId', { meetingId: id })
-      .andWhere('Meeting.creatorUserId = :userId', { userId: authUser.id })
       .getOne();
     if (!updatedMeeting) {
-      throw new CustomNotFound(['Meeting not found']);
+      throw new CustomInternalServerError();
     }
     return updatedMeeting;
   }
@@ -186,5 +187,51 @@ export class MeetingsService {
       .take(findAllMeetingsDto?.take || 10)
       .skip(findAllMeetingsDto?.skip)
       .getMany();
+  }
+
+  async updateOne(id: string, updateMeetingDto: UpdateMeetingDto) {
+    let meeting = this.meetingsRepository.create({
+      id: id,
+      ...updateMeetingDto,
+    });
+    await this.dataSource.transaction(async (entityManager) => {
+      if (updateMeetingDto.categoryNames?.length) {
+        meeting.categories = await this.categoriesService.findOrCreate(
+          updateMeetingDto.categoryNames,
+          entityManager,
+        );
+      }
+      meeting = await entityManager.getRepository(Meeting).save(meeting);
+    });
+    const updatedMeeting = await this.meetingsRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('Meeting.categories', 'Category')
+      .leftJoinAndSelect('Meeting.collaborations', 'Collaboration')
+      .leftJoinAndSelect('Collaboration.user', 'CollaborationUser')
+      .leftJoinAndSelect(
+        'CollaborationUser.categories',
+        'CollaborationUserCategory',
+      )
+      .where('Meeting.id = :id', { id: meeting.id })
+      .getOne();
+    if (!updatedMeeting) {
+      throw new CustomInternalServerError();
+    }
+    return updatedMeeting;
+  }
+
+  async assertOwnership(userId: string, meetingId: string) {
+    const exists = await this.meetingsRepository
+      .createQueryBuilder()
+      .where('Meeting.id = :meetingId', {
+        meetingId: meetingId,
+      })
+      .andWhere('Meeting.creatorUserId = :creatorUserId', {
+        creatorUserId: userId,
+      })
+      .getCount();
+    if (!exists) {
+      throw new CustomForbidden(['Access to resource not authorized']);
+    }
   }
 }

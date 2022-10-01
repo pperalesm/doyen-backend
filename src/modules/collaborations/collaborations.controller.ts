@@ -22,16 +22,15 @@ export class CollaborationsController {
 
   @Patch(':id/accept')
   async accept(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
-    const collaboration = await this.collaborationsService.accept(authUser, id);
+    await this.collaborationsService.assertOwnership(authUser.id, id);
+    const collaboration = await this.collaborationsService.accept(id);
     return new MyCollaborationDto(collaboration);
   }
 
   @Patch(':id/decline')
   async decline(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
-    const collaboration = await this.collaborationsService.decline(
-      authUser,
-      id,
-    );
+    await this.collaborationsService.assertOwnership(authUser.id, id);
+    const collaboration = await this.collaborationsService.decline(id);
     return new MyCollaborationDto(collaboration);
   }
 }

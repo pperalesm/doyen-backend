@@ -34,6 +34,7 @@ export class OtherMeetingDto {
     this.scheduledAt = meeting.scheduledAt;
     this.cancelledAt = meeting.cancelledAt;
     this.imageUrl = meeting.imageUrl;
+    this.description = meeting.description;
     this.categories = meeting.categories ? meeting.categories : [];
     this.collaborations = meeting.collaborations
       ? meeting.collaborations.map(

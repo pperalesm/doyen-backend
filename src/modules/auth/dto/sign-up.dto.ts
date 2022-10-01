@@ -67,6 +67,7 @@ export class SignUpDto {
   @IsOptional()
   language?: string;
 
+  @MaxLength(Constants.CATEGORY_NAME_MAX_LENGTH, { each: true })
   @IsString({ each: true })
   @ArrayMaxSize(Constants.CATEGORIES_MAX_SIZE)
   @IsArray()

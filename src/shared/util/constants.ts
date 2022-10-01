@@ -16,6 +16,7 @@ export const Constants = {
   EMAIL_INVALID_MESSAGE: '$property must be a valid email address',
   VALID_LANGUAGES: ['en', 'es'],
   VALID_GENDERS: ['M', 'F', 'O'],
+  CATEGORY_NAME_MAX_LENGTH: 45,
   DURATION_MIN: 5,
   DURATION_MAX: 60 * 24,
   PARTICIPANTS_MIN: 1,

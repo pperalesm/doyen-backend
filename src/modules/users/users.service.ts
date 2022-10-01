@@ -125,15 +125,15 @@ export class UsersService {
       }
       user = await entityManager.getRepository(User).save(user);
     });
-    const newUser = await this.usersRepository
+    const updatedUser = await this.usersRepository
       .createQueryBuilder()
       .leftJoinAndSelect('User.categories', 'Category')
       .where('User.id = :id', { id: user.id })
       .getOne();
-    if (!newUser) {
+    if (!updatedUser) {
       throw new CustomInternalServerError();
     }
-    return newUser;
+    return updatedUser;
   }
 
   async createOne(signUpDto: SignUpDto) {

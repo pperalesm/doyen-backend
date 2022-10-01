@@ -11,6 +11,7 @@ import {
   IsString,
   IsUUID,
   Max,
+  MaxLength,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -54,6 +55,7 @@ export class CreateMeetingDto {
   @IsOptional()
   description?: string;
 
+  @MaxLength(Constants.CATEGORY_NAME_MAX_LENGTH, { each: true })
   @IsString({ each: true })
   @ArrayMaxSize(Constants.CATEGORIES_MAX_SIZE)
   @IsArray()

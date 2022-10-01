@@ -17,6 +17,7 @@ import { CreateMeetingDto } from './dto/create-meeting.dto';
 import { FindAllMeetingsDto } from './dto/find-all-meetings.dto';
 import { MyMeetingDto } from './dto/my-meeting.dto';
 import { OtherMeetingDto } from './dto/other-meeting.dto';
+import { UpdateMeetingDto } from './dto/update-meeting.dto';
 import { MeetingsService } from './meetings.service';
 
 @Controller('meetings')
@@ -87,7 +88,8 @@ export class MeetingsController {
 
   @Patch(':id/cancel')
   async cancel(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
-    const meeting = await this.meetingsService.cancel(authUser, id);
+    await this.meetingsService.assertOwnership(authUser.id, id);
+    const meeting = await this.meetingsService.cancel(id);
     return new MyMeetingDto(meeting);
   }
 
@@ -99,5 +101,16 @@ export class MeetingsController {
   @Patch(':id/unfollow')
   async unfollow(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
     await this.meetingsService.unfollow(authUser, id);
+  }
+
+  @Patch(':id')
+  async updateOne(
+    @AuthUser() authUser: AuthUserDto,
+    @Param('id') id: string,
+    @Body() updateMeetingDto: UpdateMeetingDto,
+  ) {
+    await this.meetingsService.assertOwnership(authUser.id, id);
+    const meeting = await this.meetingsService.updateOne(id, updateMeetingDto);
+    return new MyMeetingDto(meeting);
   }
 }
