@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { Category } from '../../database/entities/category.entity';
+import { FindAllCategoriesDto } from './dto/find-all-categories.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -10,8 +11,18 @@ export class CategoriesService {
     private readonly categoriesRepository: Repository<Category>,
   ) {}
 
-  async findAll() {
-    return await this.categoriesRepository.createQueryBuilder().getMany();
+  async findAll(findAllCategoriesDto: FindAllCategoriesDto) {
+    let query = this.categoriesRepository.createQueryBuilder();
+    if (findAllCategoriesDto.name) {
+      query = query.andWhere('Category.name LIKE :name', {
+        name: '%' + findAllCategoriesDto.name + '%',
+      });
+    }
+    return await query
+      .orderBy({ name: 'ASC' })
+      .take(findAllCategoriesDto?.take || 10)
+      .skip(findAllCategoriesDto?.skip)
+      .getMany();
   }
 
   async findOrCreate(names: string[], entityManager: EntityManager) {

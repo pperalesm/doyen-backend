@@ -38,7 +38,6 @@ export class UsersService {
       .createQueryBuilder()
       .leftJoinAndSelect('User.categories', 'Category')
       .where('User.isPublic = true');
-    console.log(findAllUsersDto.username);
     if (findAllUsersDto.username) {
       query = query.andWhere('User.username LIKE :username', {
         username: '%' + findAllUsersDto.username + '%',
