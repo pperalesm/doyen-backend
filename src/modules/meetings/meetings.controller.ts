@@ -11,6 +11,7 @@ import { Active } from '../../shared/decorators/active.decorator';
 import { AuthUser } from '../../shared/decorators/auth-user.decorator';
 import { CustomBadRequest } from '../../shared/exceptions/custom-bad-request';
 import { Constants } from '../../shared/util/constants';
+import { PagingDto } from '../../shared/util/paging.dto';
 import { AuthUserDto } from '../auth/dto/auth-user.dto';
 import { CreateMeetingDto } from './dto/create-meeting.dto';
 import { FindAllMeetingsDto } from './dto/find-all-meetings.dto';
@@ -25,6 +26,15 @@ export class MeetingsController {
   @Get()
   async findAll(@Query() findAllMeetingsDto: FindAllMeetingsDto) {
     const meetings = await this.meetingsService.findAll(findAllMeetingsDto);
+    return meetings.map((meeting) => new OtherMeetingDto(meeting));
+  }
+
+  @Get('followed')
+  async followed(
+    @AuthUser() authUser: AuthUserDto,
+    @Query() pagingDto: PagingDto,
+  ) {
+    const meetings = await this.meetingsService.followed(authUser, pagingDto);
     return meetings.map((meeting) => new OtherMeetingDto(meeting));
   }
 
@@ -79,5 +89,15 @@ export class MeetingsController {
   async cancel(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
     const meeting = await this.meetingsService.cancel(authUser, id);
     return new MyMeetingDto(meeting);
+  }
+
+  @Patch(':id/follow')
+  async follow(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
+    await this.meetingsService.follow(authUser, id);
+  }
+
+  @Patch(':id/unfollow')
+  async unfollow(@AuthUser() authUser: AuthUserDto, @Param('id') id: string) {
+    await this.meetingsService.unfollow(authUser, id);
   }
 }

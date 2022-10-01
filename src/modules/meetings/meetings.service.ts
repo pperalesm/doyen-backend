@@ -10,6 +10,7 @@ import { CustomInternalServerError } from '../../shared/exceptions/custom-intern
 import { Constants } from '../../shared/util/constants';
 import { CustomNotFound } from '../../shared/exceptions/custom-not-found';
 import { FindAllMeetingsDto } from './dto/find-all-meetings.dto';
+import { PagingDto } from '../../shared/util/paging.dto';
 
 @Injectable()
 export class MeetingsService {
@@ -69,6 +70,47 @@ export class MeetingsService {
       throw new CustomInternalServerError();
     }
     return newMeeting;
+  }
+
+  async followed(authUser: AuthUserDto, pagingDto: PagingDto) {
+    return await this.meetingsRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('Meeting.categories', 'Category')
+      .leftJoinAndSelect('Meeting.creatorUser', 'CreatorUser')
+      .leftJoinAndSelect('CreatorUser.categories', 'CreatorUserCategory')
+      .leftJoinAndSelect('Meeting.collaborations', 'Collaboration')
+      .leftJoinAndSelect('Collaboration.user', 'CollaborationUser')
+      .leftJoinAndSelect(
+        'CollaborationUser.categories',
+        'CollaborationUserCategory',
+      )
+      .leftJoin('Meeting.followerUsers', 'Follower')
+      .where('Follower.id = :id', { id: authUser.id })
+      .andWhere('Meeting.cancelledAt IS NULL')
+      .andWhere(
+        '(Meeting.isAuction = true AND Meeting.closedAt > :now OR Meeting.isAuction = false AND Meeting.scheduledAt > :now)',
+        { now: new Date() },
+      )
+      .orderBy('Meeting.scheduledAt', 'ASC')
+      .take(pagingDto?.take || 10)
+      .skip(pagingDto?.skip)
+      .getMany();
+  }
+
+  async follow(authUser: AuthUserDto, id: string) {
+    await this.meetingsRepository
+      .createQueryBuilder()
+      .relation('followerUsers')
+      .of(id)
+      .add(authUser.id);
+  }
+
+  async unfollow(authUser: AuthUserDto, id: string) {
+    await this.meetingsRepository
+      .createQueryBuilder()
+      .relation('followerUsers')
+      .of(id)
+      .remove(authUser.id);
   }
 
   async cancel(authUser: AuthUserDto, id: string) {
