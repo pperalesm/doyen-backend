@@ -38,12 +38,13 @@ export class MeetingsService {
         meeting.scheduledAt.getTime() - msInDay * Constants.CLOSED_AT_DAYS,
       );
     }
-    if (createMeetingDto.categoryIds?.length) {
-      meeting.categories = await this.categoriesService.findAllById(
-        createMeetingDto.categoryIds,
-      );
-    }
     await this.dataSource.transaction(async (entityManager) => {
+      if (createMeetingDto.categoryNames?.length) {
+        meeting.categories = await this.categoriesService.findOrCreate(
+          createMeetingDto.categoryNames,
+          entityManager,
+        );
+      }
       meeting = await entityManager.getRepository(Meeting).save(meeting);
       if (createMeetingDto.collaborationsInfo?.length) {
         await this.collaborationsService.createMany(

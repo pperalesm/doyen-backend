@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { User } from '../../database/entities/user.entity';
 import { FindAllUsersDto } from './dto/find-all-users.dto';
@@ -18,6 +18,7 @@ export class UsersService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly notificationsService: NotificationsService,
     private readonly categoriesService: CategoriesService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async findOne(id: string) {
@@ -116,12 +117,15 @@ export class UsersService {
       id: authUser.id,
       ...updateMeDto,
     });
-    if (updateMeDto.categoryIds) {
-      user.categories = await this.categoriesService.findAllById(
-        updateMeDto.categoryIds,
-      );
-    }
-    user = await this.usersRepository.save(user);
+    await this.dataSource.transaction(async (entityManager) => {
+      if (updateMeDto.categoryNames?.length) {
+        user.categories = await this.categoriesService.findOrCreate(
+          updateMeDto.categoryNames,
+          entityManager,
+        );
+      }
+      user = await entityManager.getRepository(User).save(user);
+    });
     const newUser = await this.usersRepository
       .createQueryBuilder()
       .leftJoinAndSelect('User.categories', 'Category')
@@ -135,13 +139,16 @@ export class UsersService {
 
   async createOne(signUpDto: SignUpDto) {
     let user = this.usersRepository.create(signUpDto);
-    if (signUpDto.categoryIds) {
-      user.categories = await this.categoriesService.findAllById(
-        signUpDto.categoryIds,
-      );
-    }
-    user = await this.usersRepository.save(user);
-    this.notificationsService.userActivation(user);
+    await this.dataSource.transaction(async (entityManager) => {
+      if (signUpDto.categoryNames?.length) {
+        user.categories = await this.categoriesService.findOrCreate(
+          signUpDto.categoryNames,
+          entityManager,
+        );
+      }
+      user = await entityManager.getRepository(User).save(user);
+      await this.notificationsService.userActivation(user);
+    });
     return user;
   }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Category } from '../../database/entities/category.entity';
 
 @Injectable()
@@ -14,13 +14,25 @@ export class CategoriesService {
     return await this.categoriesRepository.createQueryBuilder().getMany();
   }
 
-  async findAllById(ids: string[]) {
-    if (ids.length === 0) {
-      return [];
-    }
-    return await this.categoriesRepository
+  async findOrCreate(names: string[], entityManager: EntityManager) {
+    const categories = await this.categoriesRepository
       .createQueryBuilder()
-      .where('Category.id IN (:...ids)', { ids: ids })
+      .where('Category.name IN (:...names)', { names: names })
       .getMany();
+    if (categories.length < names.length) {
+      let createdCategories: Category[] = [];
+      for (const name of names) {
+        if (!categories.filter((category) => category.name === name).length) {
+          createdCategories.push(
+            this.categoriesRepository.create({ name: name }),
+          );
+        }
+      }
+      createdCategories = await entityManager
+        .getRepository(Category)
+        .save(createdCategories);
+      categories.push(...createdCategories);
+    }
+    return categories;
   }
 }

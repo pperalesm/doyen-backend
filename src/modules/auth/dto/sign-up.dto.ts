@@ -67,10 +67,9 @@ export class SignUpDto {
   @IsOptional()
   language?: string;
 
-  @IsUUID(4, { each: true })
   @IsString({ each: true })
-  @ArrayMaxSize(Constants.CATEGORYIDS_MAX_SIZE)
+  @ArrayMaxSize(Constants.CATEGORIES_MAX_SIZE)
   @IsArray()
   @IsOptional()
-  categoryIds?: string[];
+  categoryNames?: string[];
 }
