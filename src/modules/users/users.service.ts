@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { User } from '../../database/entities/user.entity';
 import { FindAllUsersDto } from './dto/find-all-users.dto';
@@ -214,5 +214,31 @@ export class UsersService {
       .set({ password: password })
       .where({ id: id })
       .execute();
+  }
+
+  async attendMeeting(
+    userId: string,
+    meetingId: string,
+    amount: number,
+    entityManager: EntityManager,
+  ) {
+    await Promise.all([
+      entityManager
+        .getRepository(User)
+        .createQueryBuilder()
+        .update()
+        .set({
+          gains: () => 'gains + ' + amount,
+          deposit: () => 'deposit + ' + amount,
+        })
+        .where({ id: userId })
+        .execute(),
+      entityManager
+        .getRepository(User)
+        .createQueryBuilder()
+        .relation('attendedMeetings')
+        .of(userId)
+        .add(meetingId),
+    ]);
   }
 }

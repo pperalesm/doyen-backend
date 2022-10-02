@@ -49,6 +49,9 @@ export class User {
   @Column({ type: 'float', default: 0 })
   gains!: number;
 
+  @Column({ type: 'float', default: 0 })
+  deposit!: number;
+
   @Column({ default: false })
   isPublic!: boolean;
 

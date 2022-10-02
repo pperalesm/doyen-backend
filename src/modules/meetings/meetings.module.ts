@@ -5,8 +5,6 @@ import { CategoriesModule } from '../categories/categories.module';
 import { Meeting } from '../../database/entities/meeting.entity';
 import { MeetingsService } from './meetings.service';
 import { MeetingsController } from './meetings.controller';
-import { BidsModule } from '../bids/bids.module';
-import { PurchasesModule } from '../purchases/purchases.module';
 import { CollaborationsModule } from '../collaborations/collaborations.module';
 import { UsersModule } from '../users/users.module';
 
@@ -15,8 +13,6 @@ import { UsersModule } from '../users/users.module';
     TypeOrmModule.forFeature([Meeting]),
     NotificationsModule,
     CategoriesModule,
-    BidsModule,
-    PurchasesModule,
     CollaborationsModule,
     UsersModule,
   ],

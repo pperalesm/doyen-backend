@@ -7,6 +7,7 @@ export class MyUserDto {
   username: string;
   dateOfBirth: Date;
   gender: string;
+  deposit: number;
   isPublic: boolean;
   isActive: boolean;
   isVerified: boolean;
@@ -24,6 +25,7 @@ export class MyUserDto {
     this.username = user.username;
     this.dateOfBirth = user.dateOfBirth;
     this.gender = user.gender;
+    this.deposit = user.deposit;
     this.isPublic = user.isPublic;
     this.isActive = user.isActive;
     this.isVerified = user.isVerified;

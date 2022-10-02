@@ -314,4 +314,14 @@ export class MeetingsService {
       })
       .getOne();
   }
+
+  async findOneByIdWithAttendeeUsers(id: string) {
+    return await this.meetingsRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('Meeting.attendeeUsers', 'MeetingAttendeeUser')
+      .where('Meeting.id = :id', {
+        id: id,
+      })
+      .getOne();
+  }
 }
