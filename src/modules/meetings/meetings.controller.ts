@@ -32,6 +32,18 @@ export class MeetingsController {
     return meetings.map((meeting) => new OtherMeetingDto(meeting));
   }
 
+  @Get('from-followed')
+  async fromFollowed(
+    @AuthUser() authUser: AuthUserDto,
+    @Query() pagingDto: PagingDto,
+  ) {
+    const meetings = await this.meetingsService.fromFollowed(
+      authUser,
+      pagingDto,
+    );
+    return meetings.map((meeting) => new OtherMeetingDto(meeting));
+  }
+
   @Get('followed')
   async followed(
     @AuthUser() authUser: AuthUserDto,

@@ -55,7 +55,10 @@ export class UsersService {
         });
     }
     return await query
-      .orderBy('User.gains', 'DESC')
+      .orderBy(
+        findAllUsersDto.username ? 'User.username' : 'User.gains',
+        findAllUsersDto.username ? 'ASC' : 'DESC',
+      )
       .take(findAllUsersDto?.take || 10)
       .skip(findAllUsersDto?.skip)
       .getMany();

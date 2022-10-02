@@ -72,6 +72,35 @@ export class MeetingsService {
     return newMeeting;
   }
 
+  async fromFollowed(authUser: AuthUserDto, pagingDto: PagingDto) {
+    return await this.meetingsRepository
+      .createQueryBuilder()
+      .leftJoinAndSelect('Meeting.categories', 'Category')
+      .leftJoinAndSelect('Meeting.creatorUser', 'CreatorUser')
+      .leftJoinAndSelect('CreatorUser.categories', 'CreatorUserCategory')
+      .leftJoinAndSelect('Meeting.collaborations', 'Collaboration')
+      .leftJoinAndSelect('Collaboration.user', 'CollaborationUser')
+      .leftJoinAndSelect(
+        'CollaborationUser.categories',
+        'CollaborationUserCategory',
+      )
+      .leftJoin('CreatorUser.followerUsers', 'CreatorUserFollower')
+      .leftJoin('CollaborationUser.followerUsers', 'CollaborationUserFollower')
+      .where(
+        '(CreatorUserFollower.id = :id OR CollaborationUserFollower.id = :id)',
+        { id: authUser.id },
+      )
+      .andWhere('Meeting.cancelledAt IS NULL')
+      .andWhere(
+        '(Meeting.isAuction = true AND Meeting.closedAt > :now OR Meeting.isAuction = false AND Meeting.scheduledAt > :now)',
+        { now: new Date() },
+      )
+      .orderBy('Meeting.scheduledAt', 'ASC')
+      .take(pagingDto?.take || 10)
+      .skip(pagingDto?.skip)
+      .getMany();
+  }
+
   async followed(authUser: AuthUserDto, pagingDto: PagingDto) {
     return await this.meetingsRepository
       .createQueryBuilder()
